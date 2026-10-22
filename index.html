@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0f172a">
-    <meta name="description" content="PesoVault PH — A premium, secure, locally encrypted personal financial information organizer.">
+    <meta name="description" content="PesoVault PH — A premium, secure, locally encrypted personal financial and biller information organizer.">
     <title>PesoVault PH — Personal Financial Vault</title>
     
     <!-- Self-contained SVG Favicon -->
@@ -43,7 +43,7 @@
 
             /* Layout Constants */
             --header-height: 64px;
-            --content-max-width: 900px;
+            --content-max-width: 960px;
         }
 
         /* Resets & Base Typography (System Fonts) */
@@ -159,7 +159,7 @@
 
         .dashboard-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 12px;
             margin-bottom: 24px;
         }
@@ -189,7 +189,7 @@
             font-size: 1rem; transition: all var(--transition-fast);
         }
         .search-input:focus { outline: none; border-color: var(--emerald-600); box-shadow: 0 4px 20px rgba(5, 150, 105, 0.15); }
-        .filter-select { width: 140px; border-radius: var(--radius-lg); background-color: var(--white); border: 1px solid var(--border); padding: 12px; box-shadow: var(--shadow-soft); font-size: 0.9rem; }
+        .filter-select { width: 160px; border-radius: var(--radius-lg); background-color: var(--white); border: 1px solid var(--border); padding: 12px; box-shadow: var(--shadow-soft); font-size: 0.9rem; }
 
         .list-header {
             display: grid;
@@ -244,7 +244,7 @@
         
         .bubble:focus-visible { outline: 2px solid var(--emerald-600); outline-offset: 2px; }
 
-        .bubble-label { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 2px; font-weight: 500; display: block; }
+        .bubble-label { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 2px; font-weight: 500; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         .bubble-value {
             font-size: 1.05rem;
             color: var(--navy-900);
@@ -256,7 +256,6 @@
         }
         
         .bubble.left-bubble .bubble-value { color: var(--navy-800); }
-        /* Monospace for financial identifiers */
         .bubble.right-bubble .bubble-value { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; letter-spacing: 0.02em; }
         
         .fav-indicator { position: absolute; top: 8px; right: 12px; color: var(--gold-500); width: 14px; height: 14px; }
@@ -265,6 +264,11 @@
             width: 24px; height: 24px; border-radius: 4px;
             background-color: var(--navy-800); color: var(--white);
             font-size: 0.7rem; font-weight: 700; margin-right: 8px; vertical-align: middle;
+        }
+        .biller-badge {
+            background-color: var(--emerald-600); color: var(--white);
+            padding: 2px 6px; border-radius: 4px; font-size: 0.65rem;
+            margin-left: 6px; vertical-align: middle; font-weight: bold; text-transform: uppercase;
         }
 
         .row-actions { display: flex; gap: 4px; justify-content: flex-end; }
@@ -299,11 +303,12 @@
             background-color: rgba(15, 23, 42, 0.4); backdrop-filter: blur(2px);
             z-index: 100; display: flex; align-items: center; justify-content: center;
             opacity: 0; visibility: hidden; transition: all var(--transition-normal);
+            padding: 16px;
         }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         
         .modal-content {
-            background: var(--white); width: 100%; max-width: 500px;
+            background: var(--white); width: 100%; max-width: 540px;
             border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-card);
             transform: scale(0.95) translateY(10px); transition: all var(--transition-normal);
             max-height: 90vh; overflow-y: auto;
@@ -352,7 +357,7 @@
         /* Details View specific */
         .detail-row { padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;}
         .detail-row:last-child { border-bottom: none; }
-        .detail-label { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; width: 120px; flex-shrink: 0;}
+        .detail-label { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; width: 140px; flex-shrink: 0;}
         .detail-value { font-weight: 500; color: var(--navy-900); word-break: break-all; flex-grow: 1; }
         .detail-copy-area { cursor: pointer; padding: 4px 8px; margin: -4px -8px; border-radius: 4px; transition: background var(--transition-fast); }
         .detail-copy-area:hover { background: var(--ivory-100); }
@@ -361,6 +366,7 @@
 </head>
 <body>
 
+    <!-- AUTHENTICATION VIEW -->
     <div id="auth-view">
         <div class="auth-card">
             <div class="auth-logo">
@@ -395,6 +401,7 @@
         </div>
     </div>
 
+    <!-- MAIN APP VIEW -->
     <div id="app-view" class="hidden">
         <header id="app-header">
             <div class="brand">
@@ -410,7 +417,7 @@
             </div>
             <div class="header-actions">
                 <button class="icon-btn" onclick="App.toggleSound()" aria-label="Toggle Sound" id="btn-sound-toggle" title="Toggle Sound">
-                    <!-- Volume icon injected via JS based on state -->
+                    <!-- Volume icon injected via JS -->
                 </button>
                 <button class="icon-btn" onclick="App.UI.modals.settings.open()" aria-label="Settings" title="Settings">
                     <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
@@ -434,7 +441,11 @@
                 </div>
                 <div class="stat-card">
                     <span class="stat-value" id="stat-institutions">0</span>
-                    <span class="stat-label">Institutions</span>
+                    <span class="stat-label">Unique Providers</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="stat-billers">0</span>
+                    <span class="stat-label">Biller Records</span>
                 </div>
             </div>
 
@@ -442,16 +453,34 @@
             <div class="search-bar-container">
                 <div class="search-input-wrapper">
                     <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="search-input" class="search-input" placeholder="Search records..." aria-label="Search records" autocomplete="off" oninput="App.UI.handleSearch()">
+                    <input type="text" id="search-input" class="search-input" placeholder="Search banks, e-wallets, billers, names, or numbers..." aria-label="Search records" autocomplete="off" oninput="App.UI.handleSearch()">
                 </div>
                 <select id="filter-select" class="filter-select" aria-label="Filter records" onchange="App.UI.handleSearch()">
                     <option value="all">All Records</option>
                     <option value="favorites">Favorites</option>
-                    <option value="bank">Banks</option>
-                    <option value="ewallet">E-Wallets</option>
-                    <option value="card">Credit Cards</option>
+                    <optgroup label="Financial">
+                        <option value="cat:bank">Banks</option>
+                        <option value="cat:digital">Digital Banks</option>
+                        <option value="cat:ewallet">E-Wallets</option>
+                        <option value="cat:card">Credit Cards</option>
+                    </optgroup>
+                    <optgroup label="Billers">
+                        <option value="cat:biller">All Billers</option>
+                        <option value="biller:electricity">Electricity</option>
+                        <option value="biller:water">Water</option>
+                        <option value="biller:telco">Telecommunications</option>
+                        <option value="biller:cable">Cable & TV</option>
+                        <option value="biller:government">Government</option>
+                        <option value="biller:loan">Loans & Finance</option>
+                        <option value="biller:insurance">Insurance & Health</option>
+                        <option value="biller:tollway">Tollways & RFID</option>
+                        <option value="biller:education">Education</option>
+                        <option value="biller:property">Property & Real Estate</option>
+                        <option value="biller:other">Other Billers</option>
+                    </optgroup>
+                    <option value="cat:other">Other Records</option>
                 </select>
-                <button class="btn-primary" onclick="App.UI.modals.addEdit.open()" style="flex: 1; max-width: 150px; min-width: 120px;">
+                <button class="btn-primary" onclick="App.UI.openForm()" style="flex: 1; max-width: 150px; min-width: 120px;">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     Add Record
                 </button>
@@ -459,8 +488,8 @@
 
             <!-- Main Record List (Two-Column Area) -->
             <div class="list-header" id="list-header">
-                <div>Institution / Account</div>
-                <div>Account Information</div>
+                <div>Provider / Biller</div>
+                <div>Account Identifier</div>
                 <div style="text-align: right;">Actions</div>
             </div>
             
@@ -471,7 +500,7 @@
             <div id="empty-state" class="empty-state hidden">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
                 <h3 id="empty-title">No records found</h3>
-                <p id="empty-desc">Add a new financial record to get started.</p>
+                <p id="empty-desc">Add a new financial or biller record to get started.</p>
             </div>
         </main>
     </div>
@@ -487,42 +516,72 @@
                 <input type="hidden" id="form-id">
                 
                 <div class="input-group">
-                    <label for="form-institution">Institution</label>
+                    <label for="form-institution">Provider / Biller</label>
                     <select id="form-institution" class="input-control" required onchange="App.UI.handleInstitutionChange()">
-                        <option value="">Select Institution...</option>
-                        <optgroup label="Banks" id="optgroup-bank"></optgroup>
-                        <optgroup label="Digital Banks" id="optgroup-digital"></optgroup>
-                        <optgroup label="E-Wallets" id="optgroup-ewallet"></optgroup>
-                        <optgroup label="Other" id="optgroup-other"></optgroup>
-                        <option value="custom">+ Add Custom Institution</option>
+                        <option value="">Select Provider...</option>
+                        <!-- Injected via JS -->
+                        <option value="custom" style="font-weight:bold;">+ Add Custom Provider/Biller</option>
                     </select>
                 </div>
                 
-                <div class="input-group hidden" id="group-custom-inst">
-                    <label for="form-custom-inst">Custom Institution Name</label>
-                    <input type="text" id="form-custom-inst" class="input-control">
+                <div id="group-custom-inst" class="hidden" style="background: var(--ivory-50); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 16px;">
+                    <div class="input-group">
+                        <label for="form-custom-inst">Custom Provider Name</label>
+                        <input type="text" id="form-custom-inst" class="input-control" placeholder="e.g. Local Water District">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label for="form-custom-cat">Category</label>
+                        <select id="form-custom-cat" class="input-control" onchange="App.UI.handleCustomCategoryChange()">
+                            <option value="bank">Bank</option>
+                            <option value="digital">Digital Bank</option>
+                            <option value="ewallet">E-Wallet</option>
+                            <option value="card">Credit Card</option>
+                            <option value="biller">Biller</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="input-group hidden" id="group-custom-biller-type" style="margin-top: 12px; margin-bottom: 0;">
+                        <label for="form-custom-biller-type">Biller Type</label>
+                        <select id="form-custom-biller-type" class="input-control">
+                            <option value="electricity">Electricity</option>
+                            <option value="water">Water</option>
+                            <option value="telco">Telecommunications</option>
+                            <option value="cable">Cable & TV</option>
+                            <option value="government">Government</option>
+                            <option value="loan">Loans & Finance</option>
+                            <option value="insurance">Insurance & Health</option>
+                            <option value="tollway">Tollways & RFID</option>
+                            <option value="education">Education</option>
+                            <option value="property">Property & Real Estate</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="input-group">
-                    <label for="form-display-name">Account Nickname (e.g. BPI Payroll)</label>
-                    <input type="text" id="form-display-name" class="input-control" required>
+                    <label for="form-display-name">Nickname / Description <span class="text-muted" style="font-weight:normal;">(Optional for Billers)</span></label>
+                    <input type="text" id="form-display-name" class="input-control" placeholder="e.g. BPI Payroll or Home Internet">
                 </div>
 
                 <div class="input-group" style="display: grid; grid-template-columns: 1fr 2fr; gap: 12px;">
                     <div>
-                        <label for="form-primary-label">Main Info Label</label>
+                        <label for="form-primary-label">Identifier Label</label>
                         <select id="form-primary-label" class="input-control" required>
                             <option value="Account Number">Account No.</option>
                             <option value="Card Number">Card No.</option>
                             <option value="Mobile Number">Mobile No.</option>
+                            <option value="Subscriber Number">Subscriber No.</option>
+                            <option value="Member Number">Member No.</option>
+                            <option value="Policy Number">Policy No.</option>
                             <option value="Customer ID">Customer ID</option>
                             <option value="Wallet ID">Wallet ID</option>
+                            <option value="Reference Number">Reference No.</option>
                             <option value="Custom">Custom...</option>
                         </select>
                     </div>
                     <div>
-                        <label for="form-primary-value">Main Value</label>
-                        <input type="text" id="form-primary-value" class="input-control" required style="font-family: monospace;">
+                        <label for="form-primary-value">Identifier Value</label>
+                        <input type="text" id="form-primary-value" class="input-control" required style="font-family: monospace;" placeholder="Keep spaces or leading zeros">
                     </div>
                 </div>
 
@@ -542,7 +601,7 @@
                     <summary style="cursor: pointer; font-weight: 500; color: var(--navy-900);">Additional Details (Optional)</summary>
                     <div style="margin-top: 12px;">
                         <div class="input-group">
-                            <label for="form-account-holder">Account Holder Name</label>
+                            <label for="form-account-holder">Account Holder / Subscriber Name</label>
                             <input type="text" id="form-account-holder" class="input-control">
                         </div>
                         <div class="input-group">
@@ -570,9 +629,9 @@
     <div id="modal-details" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="detail-title">
         <div class="modal-content" style="max-width: 600px;">
             <div class="modal-header">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <span id="detail-icon" class="cat-icon" style="width: 32px; height: 32px; font-size: 1rem;"></span>
-                    <h2 id="detail-title" class="modal-title" style="margin: 0;"></h2>
+                <div style="display: flex; align-items: center; gap: 12px; overflow: hidden;">
+                    <span id="detail-icon" class="cat-icon" style="width: 32px; height: 32px; font-size: 1rem; flex-shrink: 0;"></span>
+                    <h2 id="detail-title" class="modal-title" style="margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></h2>
                 </div>
                 <button class="close-btn" onclick="App.UI.modals.details.close()" aria-label="Close">&times;</button>
             </div>
@@ -627,8 +686,8 @@
                 <hr style="border: none; border-top: 1px solid var(--border);">
                 
                 <section>
-                    <h3>Data Management</h3>
-                    <p class="text-muted" style="margin-bottom: 12px;">Export your locally encrypted data as JSON for backup, or import an existing backup.</p>
+                    <h3>Encrypted Data Management</h3>
+                    <p class="text-muted" style="margin-bottom: 12px;">Export your locally encrypted records as JSON for backup, or import an existing backup. The master passphrase is required to decrypt backups.</p>
                     <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                         <button class="btn-secondary" onclick="App.Logic.exportJSON()">Export Backup (.json)</button>
                         <label class="btn-secondary" style="cursor: pointer; margin: 0;">
@@ -636,6 +695,14 @@
                             <input type="file" id="file-import" accept=".json" style="display: none;" onchange="App.Logic.handleImportFile(event)">
                         </label>
                     </div>
+                </section>
+
+                <hr style="border: none; border-top: 1px solid var(--border);">
+                
+                <section>
+                    <h3>Custom Biller Directory</h3>
+                    <p class="text-muted" style="margin-bottom: 12px;">Review or clear your saved custom providers and billers. Removing a provider here will not delete your saved account records.</p>
+                    <button class="btn-secondary" onclick="App.UI.manageCustomDirectory()">View Custom Directory</button>
                 </section>
                 
                 <hr style="border: none; border-top: 1px solid var(--border);">
@@ -657,55 +724,137 @@
     <script>
         /**
          * PesoVault PH - Core Application Logic
-         * Uses IIFE module pattern to avoid global scope pollution.
          */
         const App = (() => {
-            // --- 1. DIRECTORY DATA (Bundled) ---
-            const INSTITUTIONS = [
-                // Universal & Commercial Banks
+            // --- 1. COMPREHENSIVE PHILIPPINE DIRECTORY (Bundled Seed Data) ---
+            const SEED_INSTITUTIONS = [
+                // --- UNIVERSAL & COMMERCIAL BANKS ---
                 { id: 'bdo', name: 'BDO Unibank', cat: 'bank', aliases: ['bdo network'] },
                 { id: 'bpi', name: 'Bank of the Philippine Islands', cat: 'bank', aliases: ['bpi'] },
-                { id: 'metrobank', name: 'Metropolitan Bank & Trust Co.', cat: 'bank', aliases: ['mbtc'] },
-                { id: 'landbank', name: 'Land Bank of the Philippines', cat: 'bank', aliases: ['lbp'] },
+                { id: 'metrobank', name: 'Metropolitan Bank & Trust Co.', cat: 'bank', aliases: ['mbtc', 'metrobank'] },
+                { id: 'landbank', name: 'Land Bank of the Philippines', cat: 'bank', aliases: ['lbp', 'landbank'] },
                 { id: 'pnb', name: 'Philippine National Bank', cat: 'bank', aliases: ['pnb'] },
-                { id: 'unionbank', name: 'Union Bank of the Philippines', cat: 'bank', aliases: ['ubp'] },
+                { id: 'unionbank', name: 'Union Bank of the Philippines', cat: 'bank', aliases: ['ubp', 'unionbank'] },
                 { id: 'rcbc', name: 'Rizal Commercial Banking Corp.', cat: 'bank', aliases: ['rcbc'] },
-                { id: 'securitybank', name: 'Security Bank Corporation', cat: 'bank', aliases: ['sbc'] },
-                { id: 'chinabank', name: 'China Banking Corporation', cat: 'bank', aliases: ['cbc', 'china bank savings'] },
-                { id: 'eastwest', name: 'East West Banking Corporation', cat: 'bank', aliases: ['ewbc'] },
+                { id: 'securitybank', name: 'Security Bank Corporation', cat: 'bank', aliases: ['sbc', 'sec bank'] },
+                { id: 'chinabank', name: 'China Banking Corporation', cat: 'bank', aliases: ['cbc', 'china bank'] },
+                { id: 'eastwest', name: 'East West Banking Corporation', cat: 'bank', aliases: ['ewbc', 'eastwest'] },
                 { id: 'dbp', name: 'Development Bank of the Philippines', cat: 'bank', aliases: ['dbp'] },
                 { id: 'aub', name: 'Asia United Bank', cat: 'bank', aliases: ['aub'] },
-                { id: 'psbank', name: 'Philippine Savings Bank', cat: 'bank', aliases: ['psb'] },
                 { id: 'pbcom', name: 'Philippine Bank of Communications', cat: 'bank', aliases: ['pbcom'] },
-                { id: 'robinsons', name: 'Robinsons Bank', cat: 'bank', aliases: ['rbc'] },
-                
-                // Digital Banks
+                { id: 'maybank', name: 'Maybank Philippines', cat: 'bank', aliases: ['maybank'] },
+                { id: 'psbank', name: 'Philippine Savings Bank (PSBank)', cat: 'bank', aliases: ['psb', 'psbank'] },
+                { id: 'hsbc', name: 'HSBC Philippines', cat: 'bank', aliases: ['hsbc'] },
+                { id: 'standardchartered', name: 'Standard Chartered Bank', cat: 'bank', aliases: ['scb'] },
+
+                // --- DIGITAL BANKS ---
                 { id: 'gotyme', name: 'GoTyme Bank', cat: 'digital', aliases: ['gotyme'] },
                 { id: 'mayabank', name: 'Maya Bank', cat: 'digital', aliases: ['maya bank'] },
                 { id: 'tonik', name: 'Tonik Digital Bank', cat: 'digital', aliases: ['tonik'] },
                 { id: 'uniondigital', name: 'UnionDigital Bank', cat: 'digital', aliases: ['ud'] },
                 { id: 'uno', name: 'UNO Digital Bank', cat: 'digital', aliases: ['uno'] },
-                { id: 'ofbank', name: 'Overseas Filipino Bank', cat: 'digital', aliases: ['ofb'] },
-                { id: 'seabank', name: 'SeaBank Philippines', cat: 'digital', aliases: ['seabank', 'sea'] },
+                { id: 'ofbank', name: 'Overseas Filipino Bank (OFBank)', cat: 'digital', aliases: ['ofb'] },
+                { id: 'maribank', name: 'MariBank', cat: 'digital', aliases: ['maribank', 'mari bank', 'seabank'] }, // Updated Seabank to MariBank
                 { id: 'komo', name: 'Komo (by EastWest)', cat: 'digital', aliases: ['komo'] },
+                { id: 'netbank', name: 'Netbank', cat: 'digital', aliases: ['netbank'] },
 
-                // E-Wallets
+                // --- E-WALLETS ---
                 { id: 'gcash', name: 'GCash', cat: 'ewallet', aliases: ['g-cash', 'globe'] },
-                { id: 'maya', name: 'Maya Wallet', cat: 'ewallet', aliases: ['paymaya'] },
+                { id: 'maya', name: 'Maya Wallet', cat: 'ewallet', aliases: ['paymaya', 'maya'] },
                 { id: 'grabpay', name: 'GrabPay', cat: 'ewallet', aliases: ['grab'] },
                 { id: 'shopeepay', name: 'ShopeePay', cat: 'ewallet', aliases: ['shopee'] },
                 { id: 'coinsph', name: 'Coins.ph', cat: 'ewallet', aliases: ['coins'] },
                 { id: 'palawan', name: 'PalawanPay', cat: 'ewallet', aliases: ['palawan express'] },
                 { id: 'starpay', name: 'StarPay', cat: 'ewallet', aliases: ['star'] },
+                { id: 'diskartech', name: 'DiskarTech', cat: 'ewallet', aliases: ['rcbc diskartech'] },
+                { id: 'bayad', name: 'Bayad Wallet', cat: 'ewallet', aliases: ['bayad center'] },
 
-                // Others/Cards
-                { id: 'citibank', name: 'Citibank PH / UnionBank', cat: 'bank', aliases: ['citi'] },
-                { id: 'hsbc', name: 'HSBC Philippines', cat: 'bank', aliases: ['hsbc'] }
+                // --- CREDIT CARDS ---
+                { id: 'bdo-card', name: 'BDO Credit Card', cat: 'card', aliases: ['bdo cc'] },
+                { id: 'bpi-card', name: 'BPI Credit Card', cat: 'card', aliases: ['bpi cc'] },
+                { id: 'metrobank-card', name: 'Metrobank Credit Card', cat: 'card', aliases: ['metrobank cc'] },
+                { id: 'rcbc-bankard', name: 'RCBC Bankard / Credit Card', cat: 'card', aliases: ['rcbc cc', 'bankard'] },
+                { id: 'secbank-card', name: 'Security Bank Credit Card', cat: 'card', aliases: ['sbc cc'] },
+                { id: 'ubp-card', name: 'UnionBank Credit Card (incl. Citi)', cat: 'card', aliases: ['ubp cc', 'citi'] },
+                { id: 'ewbc-card', name: 'EastWest Credit Card', cat: 'card', aliases: ['ewbc cc'] },
+
+                // --- BILLERS: GOVERNMENT ---
+                { id: 'sss', name: 'Social Security System (SSS)', cat: 'biller', billerType: 'government', aliases: ['sss contribution', 'sss loan'] },
+                { id: 'pagibig', name: 'Pag-IBIG Fund (HDMF)', cat: 'biller', billerType: 'government', aliases: ['hdmf', 'pag-ibig', 'pag ibig housing'] },
+                { id: 'philhealth', name: 'PhilHealth', cat: 'biller', billerType: 'government', aliases: ['phic', 'phil health'] },
+                { id: 'bir', name: 'Bureau of Internal Revenue (BIR)', cat: 'biller', billerType: 'government', aliases: ['bir tax'] },
+                { id: 'nbi', name: 'National Bureau of Investigation (NBI)', cat: 'biller', billerType: 'government', aliases: ['nbi clearance'] },
+                { id: 'psa', name: 'PSA Serbilis', cat: 'biller', billerType: 'government', aliases: ['psa', 'nso'] },
+                { id: 'lto', name: 'Land Transportation Office (LTO)', cat: 'biller', billerType: 'government', aliases: ['lto'] },
+                { id: 'dfa', name: 'Department of Foreign Affairs (DFA)', cat: 'biller', billerType: 'government', aliases: ['dfa passport'] },
+                { id: 'mmda', name: 'MMDA', cat: 'biller', billerType: 'government', aliases: ['mmda ticket'] },
+
+                // --- BILLERS: ELECTRICITY ---
+                { id: 'meralco', name: 'Manila Electric Company (Meralco)', cat: 'biller', billerType: 'electricity', aliases: ['meralco'] },
+                { id: 'veco', name: 'Visayan Electric Company (VECO)', cat: 'biller', billerType: 'electricity', aliases: ['veco', 'cebu electric'] },
+                { id: 'davaolight', name: 'Davao Light and Power Co.', cat: 'biller', billerType: 'electricity', aliases: ['dlpc', 'davao light'] },
+                { id: 'cotabatolight', name: 'Cotabato Light and Power Co.', cat: 'biller', billerType: 'electricity', aliases: ['clpc'] },
+                { id: 'batelec1', name: 'BATELEC I', cat: 'biller', billerType: 'electricity', aliases: ['batangas electric'] },
+                { id: 'batelec2', name: 'BATELEC II', cat: 'biller', billerType: 'electricity', aliases: ['batangas electric 2'] },
+                { id: 'beneco', name: 'BENECO', cat: 'biller', billerType: 'electricity', aliases: ['benguet electric'] },
+                { id: 'boheco', name: 'BOHECO', cat: 'biller', billerType: 'electricity', aliases: ['bohol electric'] },
+                { id: 'cepalco', name: 'CEPALCO', cat: 'biller', billerType: 'electricity', aliases: ['cagayan electric'] },
+                { id: 'pelco', name: 'PELCO', cat: 'biller', billerType: 'electricity', aliases: ['pampanga electric'] },
+                { id: 'ileco', name: 'ILECO', cat: 'biller', billerType: 'electricity', aliases: ['iloilo electric'] },
+
+                // --- BILLERS: WATER ---
+                { id: 'manilawater', name: 'Manila Water', cat: 'biller', billerType: 'water', aliases: ['manila water'] },
+                { id: 'maynilad', name: 'Maynilad Water Services', cat: 'biller', billerType: 'water', aliases: ['maynilad'] },
+                { id: 'primewater', name: 'PrimeWater', cat: 'biller', billerType: 'water', aliases: ['prime water'] },
+                { id: 'subicwater', name: 'Subic Water', cat: 'biller', billerType: 'water', aliases: ['subic water'] },
+                { id: 'mcwd', name: 'Metropolitan Cebu Water District (MCWD)', cat: 'biller', billerType: 'water', aliases: ['cebu water', 'mcwd'] },
+                { id: 'cowd', name: 'Cagayan de Oro Water District (COWD)', cat: 'biller', billerType: 'water', aliases: ['cowd'] },
+                { id: 'bwd', name: 'Baguio Water District (BWD)', cat: 'biller', billerType: 'water', aliases: ['bwd'] },
+
+                // --- BILLERS: TELECOM & INTERNET ---
+                { id: 'pldt', name: 'PLDT / PLDT Home', cat: 'biller', billerType: 'telco', aliases: ['pldt fiber', 'pldt dsl'] },
+                { id: 'globe', name: 'Globe Telecom / Globe At Home', cat: 'biller', billerType: 'telco', aliases: ['globe postpaid', 'globe broadband'] },
+                { id: 'smart', name: 'Smart Communications', cat: 'biller', billerType: 'telco', aliases: ['smart postpaid', 'smart bro'] },
+                { id: 'converge', name: 'Converge ICT Solutions', cat: 'biller', billerType: 'telco', aliases: ['converge fiber'] },
+                { id: 'dito', name: 'DITO Telecommunity', cat: 'biller', billerType: 'telco', aliases: ['dito'] },
+                { id: 'eastern', name: 'Eastern Communications', cat: 'biller', billerType: 'telco', aliases: ['eastern'] },
+
+                // --- BILLERS: CABLE & TV ---
+                { id: 'cignal', name: 'Cignal TV', cat: 'biller', billerType: 'cable', aliases: ['cignal'] },
+                { id: 'skycable', name: 'Sky Cable / Sky Broadband', cat: 'biller', billerType: 'cable', aliases: ['sky'] },
+                { id: 'royalcable', name: 'Royal Cable', cat: 'biller', billerType: 'cable', aliases: ['royal'] },
+                { id: 'cablelink', name: 'Cablelink', cat: 'biller', billerType: 'cable', aliases: ['cable link'] },
+                { id: 'gsat', name: 'GSAT Direct TV', cat: 'biller', billerType: 'cable', aliases: ['gsat'] },
+
+                // --- BILLERS: LOANS & FINANCE ---
+                { id: 'homecredit', name: 'Home Credit', cat: 'biller', billerType: 'loan', aliases: ['hc'] },
+                { id: 'asialink', name: 'Asialink Finance', cat: 'biller', billerType: 'loan', aliases: ['asialink'] },
+                { id: 'globaldominion', name: 'Global Dominion (GDFI)', cat: 'biller', billerType: 'loan', aliases: ['gdfi'] },
+                { id: 'tala', name: 'Tala Philippines', cat: 'biller', billerType: 'loan', aliases: ['tala'] },
+                { id: 'billease', name: 'BillEase', cat: 'biller', billerType: 'loan', aliases: ['billease'] },
+
+                // --- BILLERS: INSURANCE & HEALTH ---
+                { id: 'sunlife', name: 'Sun Life Philippines', cat: 'biller', billerType: 'insurance', aliases: ['sunlife'] },
+                { id: 'prulife', name: 'Pru Life UK', cat: 'biller', billerType: 'insurance', aliases: ['pru life'] },
+                { id: 'aia', name: 'AIA Philippines (Philam Life)', cat: 'biller', billerType: 'insurance', aliases: ['aia', 'philam'] },
+                { id: 'manulife', name: 'Manulife Philippines', cat: 'biller', billerType: 'insurance', aliases: ['manulife'] },
+                { id: 'maxicare', name: 'Maxicare', cat: 'biller', billerType: 'insurance', aliases: ['maxicare hmo'] },
+
+                // --- BILLERS: TOLLWAYS ---
+                { id: 'autosweep', name: 'Autosweep RFID', cat: 'biller', billerType: 'tollway', aliases: ['autosweep', 'slex', 'skyway'] },
+                { id: 'easytrip', name: 'Easytrip RFID', cat: 'biller', billerType: 'tollway', aliases: ['easytrip', 'nlex', 'cavitex'] },
+
+                // --- BILLERS: PROPERTY ---
+                { id: 'smdc', name: 'SMDC', cat: 'biller', billerType: 'property', aliases: ['sm development'] },
+                { id: 'ayalaland', name: 'Ayala Land', cat: 'biller', billerType: 'property', aliases: ['ali'] },
+                { id: 'megaworld', name: 'Megaworld Corporation', cat: 'biller', billerType: 'property', aliases: ['megaworld'] },
+                { id: 'dmci', name: 'DMCI Homes', cat: 'biller', billerType: 'property', aliases: ['dmci'] }
+
             ].sort((a, b) => a.name.localeCompare(b.name));
 
             // --- 2. STATE ---
             const state = {
-                key: null,          // CryptoKey object
+                key: null,
                 unlocked: false,
                 data: {
                     records: [],
@@ -719,10 +868,18 @@
                 searchQuery: '',
                 filter: 'all',
                 lockTimer: null,
-                tempCustomFields: [] // for Add/Edit form
+                activeDirectory: [] // Merged SEED + customInstitutions
             };
 
-            // --- STREAMING_CHUNK:Implementing Audio & Utility layers... ---
+            const rebuildDirectory = () => {
+                const custom = Array.isArray(state.data.customInstitutions) ? state.data.customInstitutions : [];
+                state.activeDirectory = [...SEED_INSTITUTIONS, ...custom].sort((a, b) => a.name.localeCompare(b.name));
+            };
+
+            const getProviderDetails = (providerId) => {
+                return state.activeDirectory.find(i => i.id === providerId) || null;
+            };
+
             // --- 3. AUDIO ENGINE ---
             const AudioEngine = {
                 ctx: null,
@@ -748,13 +905,11 @@
                         osc.connect(gain);
                         gain.connect(this.ctx.destination);
 
-                        // Tone 1: A5 (880Hz)
                         osc.frequency.setValueAtTime(880, t);
                         gain.gain.setValueAtTime(0, t);
                         gain.gain.linearRampToValueAtTime(0.08, t + 0.02);
                         gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
 
-                        // Tone 2: C#6 (1108.73Hz)
                         osc.frequency.setValueAtTime(1108.73, t + 0.1);
                         gain.gain.linearRampToValueAtTime(0.1, t + 0.11);
                         gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
@@ -800,7 +955,6 @@
                 }
             };
 
-            // --- STREAMING_CHUNK:Implementing IndexedDB Storage layer... ---
             // --- 5. STORAGE ENGINE (IndexedDB) ---
             const DB_NAME = 'PesoVaultDB';
             const DB_VERSION = 1;
@@ -847,7 +1001,6 @@
                 }
             };
 
-            // --- STREAMING_CHUNK:Implementing UI Controllers... ---
             // --- 6. UI CONTROLLERS ---
             const UI = {
                 els: {},
@@ -869,13 +1022,17 @@
                         search: document.getElementById('search-input'),
                         filter: document.getElementById('filter-select'),
                         
-                        stats: { total: document.getElementById('stat-total'), favs: document.getElementById('stat-favs'), inst: document.getElementById('stat-institutions') },
+                        stats: { 
+                            total: document.getElementById('stat-total'), 
+                            favs: document.getElementById('stat-favs'), 
+                            inst: document.getElementById('stat-institutions'),
+                            billers: document.getElementById('stat-billers')
+                        },
                         
                         form: document.getElementById('record-form'),
                         soundBtn: document.getElementById('btn-sound-toggle')
                     };
 
-                    // Modals logic
                     ['form', 'settings', 'details'].forEach(m => {
                         const el = document.getElementById(`modal-${m}`);
                         this.modals[m === 'form' ? 'addEdit' : m] = {
@@ -883,10 +1040,7 @@
                             close: () => el.classList.remove('active')
                         };
                     });
-
-                    this.populateFormSelects();
                     
-                    // Close modals on Esc or backdrop click
                     document.addEventListener('keydown', e => { if (e.key === 'Escape') this.closeAllModals(); });
                     document.querySelectorAll('.modal-overlay').forEach(overlay => {
                         overlay.addEventListener('click', e => { if(e.target === overlay) this.closeAllModals(); });
@@ -926,15 +1080,19 @@
                     return '•••• '.repeat(Math.ceil((str.length - 4) / 4)) + str.slice(-4);
                 },
                 
-                // --- STREAMING_CHUNK:Rendering Dashboard and Record List... ---
                 renderDashboard() {
                     const recs = state.data.records;
                     this.els.stats.total.textContent = recs.length;
                     this.els.stats.favs.textContent = recs.filter(r => r.favorite).length;
-                    const uniqueInst = new Set(recs.map(r => r.providerId));
-                    this.els.stats.inst.textContent = uniqueInst.size;
                     
-                    // Update sound icon
+                    const uniqueProviders = new Set(recs.map(r => r.providerId));
+                    this.els.stats.inst.textContent = uniqueProviders.size;
+                    
+                    this.els.stats.billers.textContent = recs.filter(r => {
+                        const prov = getProviderDetails(r.providerId);
+                        return (prov && prov.cat === 'biller') || r.category === 'biller';
+                    }).length;
+                    
                     this.els.soundBtn.innerHTML = state.data.settings.soundEnabled ? 
                         `<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>` : 
                         `<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
@@ -946,29 +1104,34 @@
                     const f = state.filter;
                     
                     let filtered = state.data.records.filter(r => {
-                        // Search
-                        const matchStr = `${r.displayName} ${r.institutionName} ${r.primaryFieldValue} ${r.notes || ''}`.toLowerCase();
+                        const prov = getProviderDetails(r.providerId);
+                        const rCat = prov ? prov.cat : (r.category || 'other');
+                        const rType = prov ? prov.billerType : r.billerType;
+
+                        // Search matching
+                        const aliases = prov && prov.aliases ? prov.aliases.join(' ') : '';
+                        const matchStr = `${r.displayName} ${r.institutionName} ${r.primaryFieldValue} ${r.notes || ''} ${aliases} ${rCat} ${rType||''}`.toLowerCase();
                         if (q && !matchStr.includes(q)) return false;
                         
-                        // Filter
+                        // Filter matching
                         if (f === 'favorites' && !r.favorite) return false;
-                        if (f !== 'all' && f !== 'favorites') {
-                            // Find cat
-                            const inst = INSTITUTIONS.find(i => i.id === r.providerId);
-                            const cat = inst ? inst.cat : 'other';
-                            if (f === 'bank' && cat !== 'bank' && cat !== 'digital') return false;
-                            if (f === 'ewallet' && cat !== 'ewallet') return false;
-                            // Simplistic card filter: check label
-                            if (f === 'card' && !r.primaryFieldLabel.toLowerCase().includes('card')) return false;
+                        if (f.startsWith('cat:')) {
+                            const targetCat = f.split(':')[1];
+                            if (targetCat !== 'all' && rCat !== targetCat) return false;
+                        } else if (f.startsWith('biller:')) {
+                            const targetType = f.split(':')[1];
+                            if (rCat !== 'biller') return false;
+                            if (targetType !== 'all' && rType !== targetType) return false;
                         }
+                        
                         return true;
                     });
 
-                    // Sort: Favs first, then by name
+                    // Sort: Favs first, then alphabetical by Biller/Institution name
                     filtered.sort((a, b) => {
                         if (a.favorite && !b.favorite) return -1;
                         if (!a.favorite && b.favorite) return 1;
-                        return a.displayName.localeCompare(b.displayName);
+                        return (a.institutionName || '').localeCompare(b.institutionName || '');
                     });
 
                     if (filtered.length === 0) {
@@ -979,6 +1142,10 @@
                         document.getElementById('list-header').classList.remove('hidden');
                         
                         filtered.forEach(r => {
+                            const prov = getProviderDetails(r.providerId);
+                            const rCat = prov ? prov.cat : (r.category || 'other');
+                            const isBiller = (rCat === 'biller');
+                            
                             const instName = this.escapeHTML(r.institutionName);
                             const dispName = this.escapeHTML(r.displayName);
                             const lbl = this.escapeHTML(r.primaryFieldLabel);
@@ -986,17 +1153,28 @@
                             const maskedVal = this.escapeHTML(this.maskValue(r.primaryFieldValue));
                             const iconTxt = this.getInstIcon(instName);
 
+                            // Left Bubble Layout Logic
+                            let leftLabel = isBiller ? (dispName || 'Biller') : instName;
+                            let leftValue = isBiller ? instName : dispName;
+                            // Ensure something shows up if nickname is missing
+                            if (!leftValue) leftValue = instName; 
+
+                            // Copy logic: Left always copies the actual Provider/Biller Name
+                            // Right always copies the unmasked Identifier Value
+                            
+                            const badgeHTML = isBiller ? `<span class="biller-badge">BILLER</span>` : '';
+
                             const row = document.createElement('div');
                             row.className = 'record-row';
                             row.innerHTML = `
-                                <button class="bubble left-bubble" onclick="App.Logic.copyToClipboard('${dispName}', 'Account Name copied')" aria-label="Copy ${dispName}">
+                                <button class="bubble left-bubble" onclick="App.Logic.copyToClipboard('${this.escapeHTML(r.institutionName)}', '${instName} copied')" aria-label="Copy ${instName}">
                                     ${r.favorite ? '<svg class="fav-indicator" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' : ''}
-                                    <span class="bubble-label"><span class="cat-icon">${iconTxt}</span>${instName}</span>
-                                    <span class="bubble-value">${dispName}</span>
+                                    <span class="bubble-label"><span class="cat-icon">${iconTxt}</span>${leftLabel}${badgeHTML}</span>
+                                    <span class="bubble-value" title="${leftValue}">${leftValue}</span>
                                 </button>
                                 <button class="bubble right-bubble" onclick="App.Logic.copyToClipboard('${val}', '${lbl} copied')" aria-label="Copy ${lbl}">
                                     <span class="bubble-label">${lbl}</span>
-                                    <span class="bubble-value">${maskedVal}</span>
+                                    <span class="bubble-value" title="Tap to copy full value">${maskedVal}</span>
                                 </button>
                                 <div class="row-actions">
                                     <button class="icon-btn" onclick="App.UI.openDetails('${r.id}')" aria-label="View Details" title="Details">
@@ -1017,15 +1195,45 @@
                     App.resetAutoLock();
                 },
 
-                // --- STREAMING_CHUNK:Form and Details UI handling... ---
                 populateFormSelects() {
                     const sel = document.getElementById('form-institution');
-                    INSTITUTIONS.forEach(i => {
+                    // Keep the default option and the Custom option
+                    const firstOpt = sel.options[0];
+                    const lastOpt = sel.options[sel.options.length - 1];
+                    sel.innerHTML = '';
+                    sel.appendChild(firstOpt);
+                    
+                    const groups = {
+                        bank: document.createElement('optgroup'),
+                        digital: document.createElement('optgroup'),
+                        ewallet: document.createElement('optgroup'),
+                        card: document.createElement('optgroup'),
+                        biller: document.createElement('optgroup'),
+                        other: document.createElement('optgroup')
+                    };
+                    
+                    groups.bank.label = "Banks";
+                    groups.digital.label = "Digital Banks";
+                    groups.ewallet.label = "E-Wallets";
+                    groups.card.label = "Credit Cards";
+                    groups.biller.label = "Billers (Utilities, Govt, etc.)";
+                    groups.other.label = "Other / Custom";
+
+                    state.activeDirectory.forEach(i => {
                         const opt = document.createElement('option');
-                        opt.value = i.id; opt.textContent = i.name;
-                        document.getElementById(`optgroup-${i.cat === 'bank'?'bank':i.cat==='digital'?'digital':'ewallet'}`).appendChild(opt);
+                        opt.value = i.id; 
+                        opt.textContent = i.name;
+                        const g = groups[i.cat] || groups.other;
+                        g.appendChild(opt);
+                    });
+
+                    Object.values(groups).forEach(g => {
+                        if (g.children.length > 0) sel.appendChild(g);
                     });
                     
+                    sel.appendChild(lastOpt);
+
+                    // Re-bind label select custom logic
                     document.getElementById('form-primary-label').addEventListener('change', e => {
                         document.getElementById('group-custom-label').classList.toggle('hidden', e.target.value !== 'Custom');
                     });
@@ -1033,7 +1241,34 @@
                 
                 handleInstitutionChange() {
                     const val = document.getElementById('form-institution').value;
-                    document.getElementById('group-custom-inst').classList.toggle('hidden', val !== 'custom');
+                    const customGroup = document.getElementById('group-custom-inst');
+                    
+                    if (val === 'custom') {
+                        customGroup.classList.remove('hidden');
+                        this.handleCustomCategoryChange();
+                    } else {
+                        customGroup.classList.add('hidden');
+                        
+                        // Auto-adjust default label based on category
+                        const prov = getProviderDetails(val);
+                        if (prov && prov.cat === 'biller') {
+                            document.getElementById('form-primary-label').value = 'Account Number';
+                            document.getElementById('group-custom-label').classList.add('hidden');
+                        }
+                    }
+                },
+                
+                handleCustomCategoryChange() {
+                    const catVal = document.getElementById('form-custom-cat').value;
+                    const typeGroup = document.getElementById('group-custom-biller-type');
+                    
+                    if (catVal === 'biller') {
+                        typeGroup.classList.remove('hidden');
+                        document.getElementById('form-primary-label').value = 'Account Number';
+                        document.getElementById('group-custom-label').classList.add('hidden');
+                    } else {
+                        typeGroup.classList.add('hidden');
+                    }
                 },
 
                 addCustomFieldInput(label = '', value = '') {
@@ -1055,10 +1290,12 @@
                 },
 
                 openForm(recordId = null) {
+                    this.populateFormSelects();
                     this.els.form.reset();
                     document.getElementById('form-id').value = '';
                     document.getElementById('group-custom-inst').classList.add('hidden');
                     document.getElementById('group-custom-label').classList.add('hidden');
+                    document.getElementById('group-custom-biller-type').classList.add('hidden');
                     document.getElementById('custom-fields-list').innerHTML = '';
                     document.getElementById('custom-fields-list').classList.add('hidden');
 
@@ -1068,17 +1305,22 @@
                         document.getElementById('modal-form-title').textContent = 'Edit Record';
                         document.getElementById('form-id').value = r.id;
                         
-                        // Institution select
                         const instSel = document.getElementById('form-institution');
-                        if (INSTITUTIONS.find(i => i.id === r.providerId)) {
+                        if (getProviderDetails(r.providerId)) {
                             instSel.value = r.providerId;
                         } else {
+                            // If provider no longer in active directory, handle as custom to retain data
                             instSel.value = 'custom';
                             document.getElementById('group-custom-inst').classList.remove('hidden');
                             document.getElementById('form-custom-inst').value = r.institutionName;
+                            document.getElementById('form-custom-cat').value = r.category || 'other';
+                            if (r.category === 'biller') {
+                                document.getElementById('group-custom-biller-type').classList.remove('hidden');
+                                document.getElementById('form-custom-biller-type').value = r.billerType || 'other';
+                            }
                         }
                         
-                        document.getElementById('form-display-name').value = r.displayName;
+                        document.getElementById('form-display-name').value = r.displayName || '';
                         
                         const lblSel = document.getElementById('form-primary-label');
                         const stdLabels = Array.from(lblSel.options).map(o => o.value);
@@ -1091,7 +1333,7 @@
                         }
                         
                         document.getElementById('form-primary-value').value = r.primaryFieldValue;
-                        document.getElementById('form-favorite').checked = r.favorite;
+                        document.getElementById('form-favorite').checked = !!r.favorite;
                         document.getElementById('form-account-holder').value = r.accountHolder || '';
                         document.getElementById('form-notes').value = r.notes || '';
                         
@@ -1109,7 +1351,7 @@
                     if (!r) return;
                     
                     document.getElementById('detail-icon').textContent = this.getInstIcon(r.institutionName);
-                    document.getElementById('detail-title').textContent = r.displayName;
+                    document.getElementById('detail-title').textContent = r.institutionName;
                     
                     let html = '';
                     const addRow = (label, val, copyable = true) => {
@@ -1126,7 +1368,13 @@
                         </div>`;
                     };
 
-                    addRow('Institution', r.institutionName, false);
+                    if (r.displayName) addRow('Nickname', r.displayName, false);
+                    addRow('Provider/Biller', r.institutionName, false);
+                    
+                    const prov = getProviderDetails(r.providerId);
+                    const catDisplay = prov ? prov.cat : (r.category || 'other');
+                    addRow('Category', catDisplay.toUpperCase(), false);
+
                     addRow(r.primaryFieldLabel, r.primaryFieldValue);
                     addRow('Account Holder', r.accountHolder);
                     
@@ -1146,15 +1394,20 @@
                     
                     document.getElementById('btn-detail-edit').onclick = () => { this.modals.details.close(); this.openForm(r.id); };
                     document.getElementById('btn-detail-delete').onclick = () => { 
-                        if(confirm(`Are you sure you want to delete "${r.displayName}"?`)) App.Logic.deleteRecord(r.id); 
+                        if(confirm(`Are you sure you want to delete this record?`)) App.Logic.deleteRecord(r.id); 
                     };
                     
                     this.modals.details.open();
                     App.resetAutoLock();
+                },
+
+                manageCustomDirectory() {
+                    this.closeAllModals();
+                    alert("Custom providers are automatically added to your secure directory when you save a new record with a 'Custom' provider.\n\nTo view them, just open the 'Add Record' form and check the dropdown.");
+                    this.modals.settings.open();
                 }
             };
 
-            // --- STREAMING_CHUNK:Core Application Logic (CRUD, Cryptography)... ---
             // --- 7. CORE LOGIC ---
             const Logic = {
                 async copyToClipboard(text, successMsg) {
@@ -1163,9 +1416,11 @@
                         AudioEngine.play();
                         UI.showToast(successMsg);
                     } catch (err) {
-                        // Fallback
+                        // Fallback for older browsers or non-secure contexts
                         const textArea = document.createElement("textarea");
                         textArea.value = text;
+                        textArea.style.position = 'fixed';
+                        textArea.style.opacity = '0';
                         document.body.appendChild(textArea);
                         textArea.select();
                         try {
@@ -1173,7 +1428,7 @@
                             AudioEngine.play();
                             UI.showToast(successMsg);
                         } catch (e) {
-                            UI.showToast("Failed to copy text", 'error');
+                            UI.showToast("Failed to copy text. Check browser permissions.", 'error');
                         }
                         document.body.removeChild(textArea);
                     }
@@ -1183,14 +1438,39 @@
                 async saveRecord() {
                     const id = document.getElementById('form-id').value;
                     const instSel = document.getElementById('form-institution').value;
+                    
                     let providerId = instSel;
                     let institutionName = '';
+                    let category = 'other';
+                    let billerType = null;
                     
                     if (instSel === 'custom') {
                         institutionName = document.getElementById('form-custom-inst').value.trim();
+                        if (!institutionName) return UI.showToast("Custom Provider Name is required", "error");
+                        
                         providerId = 'custom-' + institutionName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+                        category = document.getElementById('form-custom-cat').value;
+                        if (category === 'biller') {
+                            billerType = document.getElementById('form-custom-biller-type').value;
+                        }
+                        
+                        // Add to custom directory if not exists
+                        const existingCustom = state.data.customInstitutions.find(i => i.id === providerId);
+                        if (!existingCustom) {
+                            state.data.customInstitutions.push({
+                                id: providerId,
+                                name: institutionName,
+                                cat: category,
+                                billerType: billerType,
+                                custom: true
+                            });
+                            rebuildDirectory();
+                        }
                     } else {
-                        institutionName = INSTITUTIONS.find(i => i.id === instSel).name;
+                        const prov = getProviderDetails(instSel);
+                        institutionName = prov.name;
+                        category = prov.cat;
+                        if (category === 'biller') billerType = prov.billerType;
                     }
 
                     const displayName = document.getElementById('form-display-name').value.trim();
@@ -1199,11 +1479,12 @@
                         primaryFieldLabel = document.getElementById('form-custom-label').value.trim() || 'Identifier';
                     }
                     const primaryFieldValue = document.getElementById('form-primary-value').value.trim();
+                    if (!primaryFieldValue) return UI.showToast("Identifier Value is required", "error");
+
                     const favorite = document.getElementById('form-favorite').checked;
                     const accountHolder = document.getElementById('form-account-holder').value.trim();
                     const notes = document.getElementById('form-notes').value.trim();
                     
-                    // Parse custom fields
                     const customFields = [];
                     document.querySelectorAll('.custom-field-row').forEach(row => {
                         const l = row.querySelector('.cf-label').value.trim();
@@ -1214,6 +1495,7 @@
                     const record = {
                         id: id || await Crypto.generateId(),
                         providerId, institutionName, displayName, primaryFieldLabel, primaryFieldValue,
+                        category, billerType,
                         favorite, accountHolder, notes, customFields,
                         updatedAt: new Date().toISOString()
                     };
@@ -1261,14 +1543,14 @@
                     }
                 },
 
-                // --- STREAMING_CHUNK:Implementing Export and Import logic... ---
                 exportJSON() {
                     const exportData = {
                         app: "PesoVault PH",
-                        formatVersion: 1,
+                        formatVersion: 2,
                         exportedAt: new Date().toISOString(),
                         recordCount: state.data.records.length,
                         records: state.data.records,
+                        customInstitutions: state.data.customInstitutions,
                         settings: state.data.settings
                     };
                     
@@ -1298,14 +1580,35 @@
                                 throw new Error("Invalid backup format");
                             }
                             
-                            if (confirm(`Import ${imported.records.length} records? This will MERGE with existing records based on IDs.`)) {
+                            if (confirm(`Import ${imported.records.length} records?\n\nThis will safely MERGE with your existing vault based on IDs.`)) {
                                 let newCount = 0;
+                                let updateCount = 0;
+
+                                // Import custom institutions safely
+                                if (Array.isArray(imported.customInstitutions)) {
+                                    imported.customInstitutions.forEach(impInst => {
+                                        if (!state.data.customInstitutions.find(ci => ci.id === impInst.id)) {
+                                            state.data.customInstitutions.push(impInst);
+                                        }
+                                    });
+                                    rebuildDirectory();
+                                }
+
+                                // Merge records
                                 imported.records.forEach(impRec => {
+                                    // Backwards compatibility migration for V1 imports
+                                    if (!impRec.category) {
+                                        const p = getProviderDetails(impRec.providerId);
+                                        impRec.category = p ? p.cat : 'other';
+                                        if (p && p.billerType) impRec.billerType = p.billerType;
+                                    }
+
                                     const exIdx = state.data.records.findIndex(r => r.id === impRec.id);
                                     if (exIdx > -1) {
                                         // Update if newer
-                                        if (new Date(impRec.updatedAt) > new Date(state.data.records[exIdx].updatedAt)) {
+                                        if (new Date(impRec.updatedAt || 0) >= new Date(state.data.records[exIdx].updatedAt || 0)) {
                                             state.data.records[exIdx] = impRec;
+                                            updateCount++;
                                         }
                                     } else {
                                         state.data.records.push(impRec);
@@ -1318,18 +1621,18 @@
                                 await this.persist();
                                 App.syncSettingsToUI();
                                 UI.renderList();
-                                UI.showToast(`Import complete. Added ${newCount} new records.`);
+                                UI.showToast(`Import complete. Added ${newCount} new, updated ${updateCount} records.`);
                             }
                         } catch (err) {
-                            UI.showToast("Import failed: Invalid file", "error");
+                            UI.showToast("Import failed: Invalid file structure", "error");
                         }
-                        event.target.value = ''; // reset
+                        event.target.value = ''; // reset file input
                     };
                     reader.readAsText(file);
                 },
 
                 async destroyVault() {
-                    if (confirm("WARNING: This will permanently delete your encrypted vault, settings, and all records. This cannot be undone. Type 'DELETE' to confirm.")) {
+                    if (confirm("WARNING: This will permanently delete your encrypted vault, custom directory, and all records. This cannot be undone. Type 'DELETE' to confirm.")) {
                         const conf = prompt("Type 'DELETE' to confirm destruction:");
                         if (conf === 'DELETE') {
                             await Storage.clear();
@@ -1339,7 +1642,7 @@
                 }
             };
 
-            // --- STREAMING_CHUNK:App Initialization and Auth Flow... ---
+            // --- 8. APP INITIALIZATION & AUTH ---
             return {
                 UI, Logic, Crypto,
                 async init() {
@@ -1349,14 +1652,12 @@
                         
                         const meta = await Storage.get('vault_meta');
                         if (meta && meta.salt) {
-                            // Vault exists, request unlock
                             UI.els.authTitle.textContent = "Unlock Vault";
-                            UI.els.authDesc.textContent = "Enter your master passphrase to access your data.";
+                            UI.els.authDesc.textContent = "Enter your master passphrase to access your encrypted financial data.";
                             UI.els.authBtnText.textContent = "Unlock Vault";
                             UI.els.authConfirmGrp.style.display = 'none';
                             UI.els.authConfirm.removeAttribute('required');
                         } else {
-                            // New setup
                             UI.els.authTitle.textContent = "Initialize Vault";
                             UI.els.authDesc.textContent = "Create a strong master passphrase. This encrypts all your data locally.";
                             UI.els.authBtnText.textContent = "Create Vault";
@@ -1364,7 +1665,6 @@
                             UI.els.authConfirm.setAttribute('required', 'true');
                         }
                         
-                        // Add basic interactions for auto-lock reset
                         ['click', 'keypress', 'touchstart'].forEach(evt => 
                             document.addEventListener(evt, () => this.resetAutoLock(), { passive: true })
                         );
@@ -1383,19 +1683,16 @@
                         const meta = await Storage.get('vault_meta');
                         
                         if (!meta) {
-                            // Setup
                             if (pw !== conf) throw new Error("Passphrases do not match.");
                             if (pw.length < 6) throw new Error("Passphrase too short.");
                             
                             const salt = crypto.getRandomValues(new Uint8Array(16));
                             state.key = await Crypto.deriveKey(pw, salt);
                             
-                            // Initialize empty vault
                             await Logic.persist();
                             await Storage.set('vault_meta', { salt: salt });
                             
                         } else {
-                            // Unlock
                             state.key = await Crypto.deriveKey(pw, meta.salt);
                             const dataObj = await Storage.get('vault_data');
                             if (dataObj) {
@@ -1408,17 +1705,30 @@
                             }
                         }
 
-                        // Success
                         state.unlocked = true;
                         UI.els.authPassword.value = '';
                         UI.els.authConfirm.value = '';
                         UI.els.authView.classList.add('hidden');
                         UI.els.appView.classList.remove('hidden');
                         
-                        // Ensure data structure integrity
+                        // Ensure data structure integrity & defaults
                         if(!state.data.records) state.data.records = [];
+                        if(!state.data.customInstitutions) state.data.customInstitutions = [];
                         if(!state.data.settings) state.data.settings = { soundEnabled: true, maskByDefault: true, autoLockMinutes: 5 };
                         
+                        // Migrate V1 data if needed
+                        let needsPersist = false;
+                        state.data.records.forEach(r => {
+                            if (!r.category) {
+                                const p = SEED_INSTITUTIONS.find(i => i.id === r.providerId);
+                                r.category = p ? p.cat : 'other';
+                                if (p && p.billerType) r.billerType = p.billerType;
+                                needsPersist = true;
+                            }
+                        });
+                        if (needsPersist) await Logic.persist();
+
+                        rebuildDirectory();
                         this.syncSettingsToUI();
                         UI.renderList();
                         this.resetAutoLock();
@@ -1429,15 +1739,16 @@
                 },
                 
                 syncSettingsToUI() {
-                    document.getElementById('setting-sound').checked = state.data.settings.soundEnabled;
-                    document.getElementById('setting-mask').checked = state.data.settings.maskByDefault;
+                    document.getElementById('setting-sound').checked = !!state.data.settings.soundEnabled;
+                    document.getElementById('setting-mask').checked = !!state.data.settings.maskByDefault;
                     document.getElementById('setting-autolock').value = state.data.settings.autoLockMinutes;
                 },
 
                 lockVault() {
                     state.unlocked = false;
                     state.key = null;
-                    state.data = { records: [], settings: {} }; // Clear mem
+                    state.data = { records: [], customInstitutions: [], settings: {} }; // Clear mem
+                    state.activeDirectory = [];
                     UI.els.appView.classList.add('hidden');
                     UI.els.authView.classList.remove('hidden');
                     UI.closeAllModals();
@@ -1462,7 +1773,6 @@
             };
         })();
 
-        // Start App
         window.addEventListener('DOMContentLoaded', () => App.init());
     </script>
 </body>
