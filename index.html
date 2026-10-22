@@ -1,1 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="PesoVault PH — A premium, secure, locally encrypted personal financial information organizer.">
+    <title>PesoVault PH — Personal Financial Vault</title>
+    
+    <!-- Self-contained SVG Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f172a'/><path d='M30 45 L50 25 L70 45 M35 45 V75 H65 V45' stroke='%23059669' stroke-width='8' fill='none' stroke-linecap='round' stroke-linejoin='round'/><path d='M42 60 H58 M50 52 V68' stroke='%23f59e0b' stroke-width='6' stroke-linecap='round'/></svg>" type="image/svg+xml">
 
+    <style>
+        :root {
+            /* Exact Color Palette */
+            --navy-800: #1e293b;
+            --navy-900: #0f172a;
+            --ivory-50: #f8fafc;
+            --ivory-100: #f1f5f9;
+            --emerald-600: #059669;
+            --emerald-700: #047857;
+            --gold-500: #f59e0b;
+            --gold-600: #d97706;
+            --white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --muted-background: #f8fafc;
+            --danger: #dc2626;
+            --success: #059669;
+
+            /* Radii & Shadows */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --radius-xl: 24px;
+            --shadow-soft: 0 4px 18px rgba(15, 23, 42, 0.05);
+            --shadow-card: 0 10px 35px rgba(15, 23, 42, 0.07);
+
+            /* Transitions */
+            --transition-fast: 160ms ease;
+            --transition-normal: 240ms ease;
+
+            /* Layout Constants */
+            --header-height: 64px;
+            --content-max-width: 900px;
+        }
+
+        /* Resets & Base Typography (System Fonts) */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background-color: var(--ivory-50);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        button { font-family: inherit; cursor: pointer; border: none; background: none; }
+        input, select, textarea { font-family: inherit; color: var(--text-primary); }
+        
+        .hidden { display: none !important; }
+        .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+
+        /* Typography */
+        h1, h2, h3, h4 { color: var(--navy-900); font-weight: 600; margin-bottom: 0.5rem; }
+        .text-muted { color: var(--text-secondary); font-size: 0.875rem; }
+        .text-danger { color: var(--danger); }
+        .font-semibold { font-weight: 600; }
+        
+        /* Layout Shell */
+        #app-header {
+            background-color: var(--navy-900);
+            color: var(--white);
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand svg { width: 32px; height: 32px; }
+        .brand-title { font-weight: 600; font-size: 1.25rem; letter-spacing: -0.02em; }
+        .brand-tagline { font-size: 0.75rem; color: #94a3b8; display: none; margin-top: 2px; }
+        @media (min-width: 640px) { .brand-tagline { display: block; } }
+
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .icon-btn {
+            color: var(--white);
+            background: transparent;
+            width: 40px; height: 40px;
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            transition: background-color var(--transition-fast);
+        }
+        .icon-btn:hover { background-color: var(--navy-800); }
+        .icon-btn.dark { color: var(--text-primary); }
+        .icon-btn.dark:hover { background-color: var(--border); }
+        .icon-btn svg { width: 20px; height: 20px; fill: currentColor; }
+
+        main {
+            flex: 1;
+            width: 100%;
+            max-width: var(--content-max-width);
+            margin: 0 auto;
+            padding: 24px 16px 80px;
+        }
+
+        .btn-primary {
+            background-color: var(--emerald-600);
+            color: var(--white);
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            transition: background-color var(--transition-fast);
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-primary:hover { background-color: var(--emerald-700); }
+        .btn-primary:focus-visible { outline: 2px solid var(--emerald-600); outline-offset: 2px; }
+        
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--navy-900);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            transition: all var(--transition-fast);
+        }
+        .btn-secondary:hover { background-color: var(--ivory-100); border-color: #cbd5e1; }
+        
+        .btn-danger { background-color: var(--white); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-danger:hover { background-color: #fef2f2; }
+
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; font-size: 0.875rem; font-weight: 500; color: var(--navy-900); margin-bottom: 6px; }
+        .input-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background-color: var(--white);
+            transition: border-color var(--transition-fast);
+            font-size: 1rem;
+        }
+        .input-control:focus { outline: none; border-color: var(--emerald-600); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1); }
+        .input-control::placeholder { color: #94a3b8; }
+        select.input-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 36px; }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            box-shadow: var(--shadow-soft);
+            display: flex; flex-direction: column;
+        }
+        .stat-value { font-size: 1.75rem; font-weight: 600; color: var(--navy-900); line-height: 1.2; }
+        .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; margin-top: 4px; }
+
+        .search-bar-container {
+            position: relative;
+            margin-bottom: 24px;
+            display: flex; gap: 12px;
+            flex-wrap: wrap;
+        }
+        .search-input-wrapper { flex: 1; position: relative; min-width: 250px; }
+        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); width: 20px; height: 20px; }
+        .search-input {
+            width: 100%; padding: 12px 16px 12px 42px;
+            border: 2px solid transparent; border-radius: var(--radius-lg);
+            background-color: var(--white); box-shadow: var(--shadow-soft);
+            font-size: 1rem; transition: all var(--transition-fast);
+        }
+        .search-input:focus { outline: none; border-color: var(--emerald-600); box-shadow: 0 4px 20px rgba(5, 150, 105, 0.15); }
+        .filter-select { width: 140px; border-radius: var(--radius-lg); background-color: var(--white); border: 1px solid var(--border); padding: 12px; box-shadow: var(--shadow-soft); font-size: 0.9rem; }
+
+        .list-header {
+            display: grid;
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) 80px;
+            gap: 16px;
+            padding: 0 16px 8px 16px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+        
+        .record-list { display: flex; flex-direction: column; gap: 12px; }
+        
+        .record-row {
+            display: grid;
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) 80px;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* Bubble Styling - Semantic buttons representing data surfaces */
+        .bubble {
+            background-color: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            text-align: left;
+            box-shadow: var(--shadow-soft);
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 64px;
+        }
+        
+        .bubble:hover {
+            border-color: #cbd5e1;
+            background-color: var(--ivory-50);
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+            transform: translateY(-1px);
+        }
+        
+        .bubble:active {
+            transform: translateY(1px);
+            background-color: var(--ivory-100);
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+        }
+        
+        .bubble:focus-visible { outline: 2px solid var(--emerald-600); outline-offset: 2px; }
+
+        .bubble-label { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 2px; font-weight: 500; display: block; }
+        .bubble-value {
+            font-size: 1.05rem;
+            color: var(--navy-900);
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+        
+        .bubble.left-bubble .bubble-value { color: var(--navy-800); }
+        /* Monospace for financial identifiers */
+        .bubble.right-bubble .bubble-value { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; letter-spacing: 0.02em; }
+        
+        .fav-indicator { position: absolute; top: 8px; right: 12px; color: var(--gold-500); width: 14px; height: 14px; }
+        .cat-icon {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 24px; height: 24px; border-radius: 4px;
+            background-color: var(--navy-800); color: var(--white);
+            font-size: 0.7rem; font-weight: 700; margin-right: 8px; vertical-align: middle;
+        }
+
+        .row-actions { display: flex; gap: 4px; justify-content: flex-end; }
+        .row-actions .icon-btn { width: 36px; height: 36px; color: var(--text-secondary); }
+        .row-actions .icon-btn:hover { background-color: var(--ivory-100); color: var(--navy-900); }
+
+        /* Responsive stacking for very narrow screens */
+        @media (max-width: 640px) {
+            .list-header { display: none; }
+            .record-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                background: var(--white);
+                padding: 12px;
+                border-radius: var(--radius-lg);
+                border: 1px solid var(--border);
+                box-shadow: var(--shadow-soft);
+                position: relative;
+            }
+            .bubble {
+                box-shadow: none; border-color: var(--border); background-color: var(--ivory-50);
+                min-height: 54px; padding: 10px 14px;
+            }
+            .row-actions {
+                position: absolute; top: 12px; right: 12px; background: var(--white); border-radius: var(--radius-sm);
+            }
+            .bubble.left-bubble { padding-right: 80px; /* Space for actions */ }
+        }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(15, 23, 42, 0.4); backdrop-filter: blur(2px);
+            z-index: 100; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all var(--transition-normal);
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        
+        .modal-content {
+            background: var(--white); width: 100%; max-width: 500px;
+            border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-card);
+            transform: scale(0.95) translateY(10px); transition: all var(--transition-normal);
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { font-size: 1.25rem; font-weight: 600; }
+        .close-btn { background: none; border: none; font-size: 1.5rem; color: var(--text-secondary); cursor: pointer; line-height: 1; padding: 4px; border-radius: 4px; }
+        .close-btn:hover { background-color: var(--ivory-100); color: var(--navy-900); }
+
+        .modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+        /* Toasts */
+        .toast-container { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+        .toast {
+            background-color: var(--navy-900); color: var(--white);
+            padding: 12px 24px; border-radius: var(--radius-xl); font-size: 0.9rem; font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex; align-items: center; gap: 8px;
+            animation: slideUpFade 0.3s ease forwards;
+        }
+        .toast.error { background-color: var(--danger); }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+        /* Auth View Specific */
+        #auth-view { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; background-color: var(--navy-900); color: var(--white); }
+        .auth-card { background: var(--white); color: var(--text-primary); padding: 32px; border-radius: var(--radius-lg); width: 100%; max-width: 400px; box-shadow: var(--shadow-card); }
+        .auth-logo { margin-bottom: 24px; display: flex; justify-content: center; }
+        .auth-logo svg { width: 64px; height: 64px; }
+        .auth-card h1 { font-size: 1.5rem; text-align: center; margin-bottom: 8px; }
+        .auth-desc { text-align: center; color: var(--text-secondary); margin-bottom: 24px; font-size: 0.9rem; }
+        .auth-error { color: var(--danger); font-size: 0.875rem; text-align: center; margin-top: 8px; min-height: 20px; }
+
+        /* Empty States */
+        .empty-state { text-align: center; padding: 48px 24px; color: var(--text-secondary); background: var(--white); border-radius: var(--radius-lg); border: 1px dashed #cbd5e1; margin-top: 24px; }
+        .empty-state svg { width: 48px; height: 48px; margin: 0 auto 16px; opacity: 0.5; }
+        .empty-state h3 { color: var(--navy-900); margin-bottom: 8px; }
+
+        /* Custom Fields Container */
+        .custom-fields-container { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 16px; background-color: var(--ivory-50); }
+        .custom-field-row { display: grid; grid-template-columns: 1fr 1fr 40px; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .custom-field-row:last-child { margin-bottom: 0; }
+
+        /* Details View specific */
+        .detail-row { padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;}
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; width: 120px; flex-shrink: 0;}
+        .detail-value { font-weight: 500; color: var(--navy-900); word-break: break-all; flex-grow: 1; }
+        .detail-copy-area { cursor: pointer; padding: 4px 8px; margin: -4px -8px; border-radius: 4px; transition: background var(--transition-fast); }
+        .detail-copy-area:hover { background: var(--ivory-100); }
+
+    </style>
+</head>
+<body>
+
+    <div id="auth-view">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                    <rect width="100" height="100" rx="20" fill="#0f172a"/>
+                    <path d="M30 45 L50 25 L70 45 M35 45 V75 H65 V45" stroke="#059669" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M42 60 H58 M50 52 V68" stroke="#f59e0b" stroke-width="6" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h1 id="auth-title">Initialize Vault</h1>
+            <p id="auth-desc" class="auth-desc">Create a strong master passphrase. This encrypts all your data locally.</p>
+            
+            <form id="auth-form" onsubmit="event.preventDefault(); App.handleAuth();">
+                <div class="input-group">
+                    <label for="auth-password">Master Passphrase</label>
+                    <input type="password" id="auth-password" class="input-control" required autocomplete="current-password" autofocus>
+                </div>
+                <div class="input-group" id="auth-confirm-group">
+                    <label for="auth-confirm">Confirm Passphrase</label>
+                    <input type="password" id="auth-confirm" class="input-control">
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <span id="auth-btn-text">Create Vault</span>
+                </button>
+                <div id="auth-error" class="auth-error"></div>
+            </form>
+            
+            <div id="auth-warning" class="text-muted" style="margin-top: 16px; font-size: 0.8rem; text-align: center;">
+                If you forget this passphrase, your data cannot be recovered.
+            </div>
+        </div>
+    </div>
+
+    <div id="app-view" class="hidden">
+        <header id="app-header">
+            <div class="brand">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                    <rect width="100" height="100" rx="20" fill="#1e293b"/>
+                    <path d="M30 45 L50 25 L70 45 M35 45 V75 H65 V45" stroke="#059669" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M42 60 H58 M50 52 V68" stroke="#f59e0b" stroke-width="6" stroke-linecap="round"/>
+                </svg>
+                <div>
+                    <div class="brand-title">PesoVault PH</div>
+                    <div class="brand-tagline">Your financial details. Organized and ready.</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="App.toggleSound()" aria-label="Toggle Sound" id="btn-sound-toggle" title="Toggle Sound">
+                    <!-- Volume icon injected via JS based on state -->
+                </button>
+                <button class="icon-btn" onclick="App.UI.modals.settings.open()" aria-label="Settings" title="Settings">
+                    <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+                </button>
+                <button class="icon-btn" onclick="App.lockVault()" aria-label="Lock Vault" title="Lock Vault">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Dashboard Stats -->
+            <div class="dashboard-stats" aria-label="Dashboard Overview">
+                <div class="stat-card">
+                    <span class="stat-value" id="stat-total">0</span>
+                    <span class="stat-label">Total Records</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="stat-favs">0</span>
+                    <span class="stat-label">Favorites</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="stat-institutions">0</span>
+                    <span class="stat-label">Institutions</span>
+                </div>
+            </div>
+
+            <!-- Controls (Search, Filter, Add) -->
+            <div class="search-bar-container">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="search-input" class="search-input" placeholder="Search records..." aria-label="Search records" autocomplete="off" oninput="App.UI.handleSearch()">
+                </div>
+                <select id="filter-select" class="filter-select" aria-label="Filter records" onchange="App.UI.handleSearch()">
+                    <option value="all">All Records</option>
+                    <option value="favorites">Favorites</option>
+                    <option value="bank">Banks</option>
+                    <option value="ewallet">E-Wallets</option>
+                    <option value="card">Credit Cards</option>
+                </select>
+                <button class="btn-primary" onclick="App.UI.modals.addEdit.open()" style="flex: 1; max-width: 150px; min-width: 120px;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Add Record
+                </button>
+            </div>
+
+            <!-- Main Record List (Two-Column Area) -->
+            <div class="list-header" id="list-header">
+                <div>Institution / Account</div>
+                <div>Account Information</div>
+                <div style="text-align: right;">Actions</div>
+            </div>
+            
+            <div id="record-list" class="record-list" role="list">
+                <!-- Records injected here via JS -->
+            </div>
+            
+            <div id="empty-state" class="empty-state hidden">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                <h3 id="empty-title">No records found</h3>
+                <p id="empty-desc">Add a new financial record to get started.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="modal-form" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-form-title">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-form-title" class="modal-title">Add Record</h2>
+                <button class="close-btn" onclick="App.UI.modals.addEdit.close()" aria-label="Close">&times;</button>
+            </div>
+            <form id="record-form" onsubmit="event.preventDefault(); App.Logic.saveRecord();">
+                <input type="hidden" id="form-id">
+                
+                <div class="input-group">
+                    <label for="form-institution">Institution</label>
+                    <select id="form-institution" class="input-control" required onchange="App.UI.handleInstitutionChange()">
+                        <option value="">Select Institution...</option>
+                        <optgroup label="Banks" id="optgroup-bank"></optgroup>
+                        <optgroup label="Digital Banks" id="optgroup-digital"></optgroup>
+                        <optgroup label="E-Wallets" id="optgroup-ewallet"></optgroup>
+                        <optgroup label="Other" id="optgroup-other"></optgroup>
+                        <option value="custom">+ Add Custom Institution</option>
+                    </select>
+                </div>
+                
+                <div class="input-group hidden" id="group-custom-inst">
+                    <label for="form-custom-inst">Custom Institution Name</label>
+                    <input type="text" id="form-custom-inst" class="input-control">
+                </div>
+
+                <div class="input-group">
+                    <label for="form-display-name">Account Nickname (e.g. BPI Payroll)</label>
+                    <input type="text" id="form-display-name" class="input-control" required>
+                </div>
+
+                <div class="input-group" style="display: grid; grid-template-columns: 1fr 2fr; gap: 12px;">
+                    <div>
+                        <label for="form-primary-label">Main Info Label</label>
+                        <select id="form-primary-label" class="input-control" required>
+                            <option value="Account Number">Account No.</option>
+                            <option value="Card Number">Card No.</option>
+                            <option value="Mobile Number">Mobile No.</option>
+                            <option value="Customer ID">Customer ID</option>
+                            <option value="Wallet ID">Wallet ID</option>
+                            <option value="Custom">Custom...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="form-primary-value">Main Value</label>
+                        <input type="text" id="form-primary-value" class="input-control" required style="font-family: monospace;">
+                    </div>
+                </div>
+
+                <div class="input-group hidden" id="group-custom-label">
+                    <label for="form-custom-label">Custom Label Name</label>
+                    <input type="text" id="form-custom-label" class="input-control">
+                </div>
+                
+                <div class="input-group">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal; margin-top: 8px;">
+                        <input type="checkbox" id="form-favorite" style="width: 16px; height: 16px; accent-color: var(--emerald-600);">
+                        <span>Mark as Favorite</span>
+                    </label>
+                </div>
+
+                <details style="margin-bottom: 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px;">
+                    <summary style="cursor: pointer; font-weight: 500; color: var(--navy-900);">Additional Details (Optional)</summary>
+                    <div style="margin-top: 12px;">
+                        <div class="input-group">
+                            <label for="form-account-holder">Account Holder Name</label>
+                            <input type="text" id="form-account-holder" class="input-control">
+                        </div>
+                        <div class="input-group">
+                            <label for="form-notes">Notes</label>
+                            <textarea id="form-notes" class="input-control" rows="2"></textarea>
+                        </div>
+                        
+                        <div id="custom-fields-area">
+                            <label>Custom Fields</label>
+                            <div id="custom-fields-list" class="custom-fields-container hidden"></div>
+                            <button type="button" class="btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="App.UI.addCustomFieldInput()">+ Add Field</button>
+                        </div>
+                    </div>
+                </details>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="App.UI.modals.addEdit.close()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Record Details Modal -->
+    <div id="modal-details" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span id="detail-icon" class="cat-icon" style="width: 32px; height: 32px; font-size: 1rem;"></span>
+                    <h2 id="detail-title" class="modal-title" style="margin: 0;"></h2>
+                </div>
+                <button class="close-btn" onclick="App.UI.modals.details.close()" aria-label="Close">&times;</button>
+            </div>
+            <div id="detail-content" style="margin-top: 20px;">
+                <!-- Injected via JS -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-danger" id="btn-detail-delete" style="margin-right: auto;">Delete</button>
+                <button type="button" class="btn-secondary" id="btn-detail-edit">Edit</button>
+                <button type="button" class="btn-primary" onclick="App.UI.modals.details.close()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="modal-settings" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="settings-title" class="modal-title">Settings</h2>
+                <button class="close-btn" onclick="App.UI.modals.settings.close()" aria-label="Close">&times;</button>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <section>
+                    <h3>Preferences</h3>
+                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 8px 0;">
+                        <input type="checkbox" id="setting-sound" style="width: 18px; height: 18px; accent-color: var(--emerald-600);" onchange="App.Logic.updateSettings()">
+                        <div>
+                            <div style="font-weight: 500;">Copy Confirmation Sound</div>
+                            <div class="text-muted">Play a gentle tone when text is copied.</div>
+                        </div>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 8px 0;">
+                        <input type="checkbox" id="setting-mask" style="width: 18px; height: 18px; accent-color: var(--emerald-600);" onchange="App.Logic.updateSettings()">
+                        <div>
+                            <div style="font-weight: 500;">Mask Values by Default</div>
+                            <div class="text-muted">Hide sensitive identifiers until tapped.</div>
+                        </div>
+                    </label>
+                    <div style="margin-top: 12px;">
+                        <label for="setting-autolock" style="font-weight: 500; font-size: 0.9rem;">Auto-lock Timeout (minutes)</label>
+                        <select id="setting-autolock" class="input-control" style="width: 120px; display: block; margin-top: 4px;" onchange="App.Logic.updateSettings()">
+                            <option value="1">1</option>
+                            <option value="5">5</option>
+                            <option value="15">15</option>
+                            <option value="30">30</option>
+                            <option value="0">Never</option>
+                        </select>
+                    </div>
+                </section>
+                
+                <hr style="border: none; border-top: 1px solid var(--border);">
+                
+                <section>
+                    <h3>Data Management</h3>
+                    <p class="text-muted" style="margin-bottom: 12px;">Export your locally encrypted data as JSON for backup, or import an existing backup.</p>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <button class="btn-secondary" onclick="App.Logic.exportJSON()">Export Backup (.json)</button>
+                        <label class="btn-secondary" style="cursor: pointer; margin: 0;">
+                            Import Backup
+                            <input type="file" id="file-import" accept=".json" style="display: none;" onchange="App.Logic.handleImportFile(event)">
+                        </label>
+                    </div>
+                </section>
+                
+                <hr style="border: none; border-top: 1px solid var(--border);">
+                
+                <section>
+                    <button class="btn-danger" style="width: 100%;" onclick="App.Logic.destroyVault()">Destroy Vault & Erase Data</button>
+                </section>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn-primary" onclick="App.UI.modals.settings.close()">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <script>
+        /**
+         * PesoVault PH - Core Application Logic
+         * Uses IIFE module pattern to avoid global scope pollution.
+         */
+        const App = (() => {
+            // --- 1. DIRECTORY DATA (Bundled) ---
+            const INSTITUTIONS = [
+                // Universal & Commercial Banks
+                { id: 'bdo', name: 'BDO Unibank', cat: 'bank', aliases: ['bdo network'] },
+                { id: 'bpi', name: 'Bank of the Philippine Islands', cat: 'bank', aliases: ['bpi'] },
+                { id: 'metrobank', name: 'Metropolitan Bank & Trust Co.', cat: 'bank', aliases: ['mbtc'] },
+                { id: 'landbank', name: 'Land Bank of the Philippines', cat: 'bank', aliases: ['lbp'] },
+                { id: 'pnb', name: 'Philippine National Bank', cat: 'bank', aliases: ['pnb'] },
+                { id: 'unionbank', name: 'Union Bank of the Philippines', cat: 'bank', aliases: ['ubp'] },
+                { id: 'rcbc', name: 'Rizal Commercial Banking Corp.', cat: 'bank', aliases: ['rcbc'] },
+                { id: 'securitybank', name: 'Security Bank Corporation', cat: 'bank', aliases: ['sbc'] },
+                { id: 'chinabank', name: 'China Banking Corporation', cat: 'bank', aliases: ['cbc', 'china bank savings'] },
+                { id: 'eastwest', name: 'East West Banking Corporation', cat: 'bank', aliases: ['ewbc'] },
+                { id: 'dbp', name: 'Development Bank of the Philippines', cat: 'bank', aliases: ['dbp'] },
+                { id: 'aub', name: 'Asia United Bank', cat: 'bank', aliases: ['aub'] },
+                { id: 'psbank', name: 'Philippine Savings Bank', cat: 'bank', aliases: ['psb'] },
+                { id: 'pbcom', name: 'Philippine Bank of Communications', cat: 'bank', aliases: ['pbcom'] },
+                { id: 'robinsons', name: 'Robinsons Bank', cat: 'bank', aliases: ['rbc'] },
+                
+                // Digital Banks
+                { id: 'gotyme', name: 'GoTyme Bank', cat: 'digital', aliases: ['gotyme'] },
+                { id: 'mayabank', name: 'Maya Bank', cat: 'digital', aliases: ['maya bank'] },
+                { id: 'tonik', name: 'Tonik Digital Bank', cat: 'digital', aliases: ['tonik'] },
+                { id: 'uniondigital', name: 'UnionDigital Bank', cat: 'digital', aliases: ['ud'] },
+                { id: 'uno', name: 'UNO Digital Bank', cat: 'digital', aliases: ['uno'] },
+                { id: 'ofbank', name: 'Overseas Filipino Bank', cat: 'digital', aliases: ['ofb'] },
+                { id: 'seabank', name: 'SeaBank Philippines', cat: 'digital', aliases: ['seabank', 'sea'] },
+                { id: 'komo', name: 'Komo (by EastWest)', cat: 'digital', aliases: ['komo'] },
+
+                // E-Wallets
+                { id: 'gcash', name: 'GCash', cat: 'ewallet', aliases: ['g-cash', 'globe'] },
+                { id: 'maya', name: 'Maya Wallet', cat: 'ewallet', aliases: ['paymaya'] },
+                { id: 'grabpay', name: 'GrabPay', cat: 'ewallet', aliases: ['grab'] },
+                { id: 'shopeepay', name: 'ShopeePay', cat: 'ewallet', aliases: ['shopee'] },
+                { id: 'coinsph', name: 'Coins.ph', cat: 'ewallet', aliases: ['coins'] },
+                { id: 'palawan', name: 'PalawanPay', cat: 'ewallet', aliases: ['palawan express'] },
+                { id: 'starpay', name: 'StarPay', cat: 'ewallet', aliases: ['star'] },
+
+                // Others/Cards
+                { id: 'citibank', name: 'Citibank PH / UnionBank', cat: 'bank', aliases: ['citi'] },
+                { id: 'hsbc', name: 'HSBC Philippines', cat: 'bank', aliases: ['hsbc'] }
+            ].sort((a, b) => a.name.localeCompare(b.name));
+
+            // --- 2. STATE ---
+            const state = {
+                key: null,          // CryptoKey object
+                unlocked: false,
+                data: {
+                    records: [],
+                    customInstitutions: [],
+                    settings: {
+                        soundEnabled: true,
+                        maskByDefault: true,
+                        autoLockMinutes: 5
+                    }
+                },
+                searchQuery: '',
+                filter: 'all',
+                lockTimer: null,
+                tempCustomFields: [] // for Add/Edit form
+            };
+
+            // --- STREAMING_CHUNK:Implementing Audio & Utility layers... ---
+            // --- 3. AUDIO ENGINE ---
+            const AudioEngine = {
+                ctx: null,
+                init() {
+                    if (!this.ctx) {
+                        const AC = window.AudioContext || window.webkitAudioContext;
+                        if (AC) this.ctx = new AC();
+                    }
+                },
+                play() {
+                    if (!state.data.settings.soundEnabled) return;
+                    this.init();
+                    if (!this.ctx) return;
+                    
+                    if (this.ctx.state === 'suspended') this.ctx.resume();
+
+                    try {
+                        const t = this.ctx.currentTime;
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        
+                        osc.type = 'sine';
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+
+                        // Tone 1: A5 (880Hz)
+                        osc.frequency.setValueAtTime(880, t);
+                        gain.gain.setValueAtTime(0, t);
+                        gain.gain.linearRampToValueAtTime(0.08, t + 0.02);
+                        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+
+                        // Tone 2: C#6 (1108.73Hz)
+                        osc.frequency.setValueAtTime(1108.73, t + 0.1);
+                        gain.gain.linearRampToValueAtTime(0.1, t + 0.11);
+                        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+
+                        osc.start(t);
+                        osc.stop(t + 0.35);
+                    } catch (e) { console.warn("Audio playback failed", e); }
+                }
+            };
+
+            // --- 4. CRYPTO ENGINE (Web Crypto API) ---
+            const Crypto = {
+                async generateId() {
+                    return crypto.randomUUID ? crypto.randomUUID() : 
+                           'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+                               let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                               return v.toString(16);
+                           });
+                },
+                async deriveKey(password, salt) {
+                    const enc = new TextEncoder();
+                    const keyMaterial = await crypto.subtle.importKey(
+                        "raw", enc.encode(password), {name: "PBKDF2"}, false, ["deriveKey"]
+                    );
+                    return await crypto.subtle.deriveKey(
+                        { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+                        keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]
+                    );
+                },
+                async encrypt(dataObj) {
+                    if (!state.key) throw new Error("Vault locked");
+                    const iv = crypto.getRandomValues(new Uint8Array(12));
+                    const enc = new TextEncoder();
+                    const data = enc.encode(JSON.stringify(dataObj));
+                    const cipher = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, state.key, data);
+                    return { iv, cipher };
+                },
+                async decrypt(cipher, iv) {
+                    if (!state.key) throw new Error("Vault locked");
+                    const data = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, state.key, cipher);
+                    const dec = new TextDecoder();
+                    return JSON.parse(dec.decode(data));
+                }
+            };
+
+            // --- STREAMING_CHUNK:Implementing IndexedDB Storage layer... ---
+            // --- 5. STORAGE ENGINE (IndexedDB) ---
+            const DB_NAME = 'PesoVaultDB';
+            const DB_VERSION = 1;
+            const STORE_NAME = 'vaultStore';
+            
+            const Storage = {
+                db: null,
+                init() {
+                    return new Promise((resolve, reject) => {
+                        const req = indexedDB.open(DB_NAME, DB_VERSION);
+                        req.onupgradeneeded = e => {
+                            const db = e.target.result;
+                            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                                db.createObjectStore(STORE_NAME);
+                            }
+                        };
+                        req.onsuccess = e => { this.db = e.target.result; resolve(); };
+                        req.onerror = e => reject("IndexedDB error");
+                    });
+                },
+                async get(key) {
+                    return new Promise((resolve, reject) => {
+                        const tx = this.db.transaction(STORE_NAME, 'readonly');
+                        const req = tx.objectStore(STORE_NAME).get(key);
+                        req.onsuccess = () => resolve(req.result);
+                        req.onerror = () => reject(req.error);
+                    });
+                },
+                async set(key, value) {
+                    return new Promise((resolve, reject) => {
+                        const tx = this.db.transaction(STORE_NAME, 'readwrite');
+                        const req = tx.objectStore(STORE_NAME).put(value, key);
+                        req.onsuccess = () => resolve();
+                        req.onerror = () => reject(req.error);
+                    });
+                },
+                async clear() {
+                    return new Promise((resolve, reject) => {
+                        const tx = this.db.transaction(STORE_NAME, 'readwrite');
+                        const req = tx.objectStore(STORE_NAME).clear();
+                        req.onsuccess = () => resolve();
+                        req.onerror = () => reject(req.error);
+                    });
+                }
+            };
+
+            // --- STREAMING_CHUNK:Implementing UI Controllers... ---
+            // --- 6. UI CONTROLLERS ---
+            const UI = {
+                els: {},
+                modals: {},
+                init() {
+                    this.els = {
+                        authView: document.getElementById('auth-view'),
+                        appView: document.getElementById('app-view'),
+                        authTitle: document.getElementById('auth-title'),
+                        authDesc: document.getElementById('auth-desc'),
+                        authBtnText: document.getElementById('auth-btn-text'),
+                        authConfirmGrp: document.getElementById('auth-confirm-group'),
+                        authPassword: document.getElementById('auth-password'),
+                        authConfirm: document.getElementById('auth-confirm'),
+                        authError: document.getElementById('auth-error'),
+                        
+                        list: document.getElementById('record-list'),
+                        emptyState: document.getElementById('empty-state'),
+                        search: document.getElementById('search-input'),
+                        filter: document.getElementById('filter-select'),
+                        
+                        stats: { total: document.getElementById('stat-total'), favs: document.getElementById('stat-favs'), inst: document.getElementById('stat-institutions') },
+                        
+                        form: document.getElementById('record-form'),
+                        soundBtn: document.getElementById('btn-sound-toggle')
+                    };
+
+                    // Modals logic
+                    ['form', 'settings', 'details'].forEach(m => {
+                        const el = document.getElementById(`modal-${m}`);
+                        this.modals[m === 'form' ? 'addEdit' : m] = {
+                            open: () => el.classList.add('active'),
+                            close: () => el.classList.remove('active')
+                        };
+                    });
+
+                    this.populateFormSelects();
+                    
+                    // Close modals on Esc or backdrop click
+                    document.addEventListener('keydown', e => { if (e.key === 'Escape') this.closeAllModals(); });
+                    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                        overlay.addEventListener('click', e => { if(e.target === overlay) this.closeAllModals(); });
+                    });
+                },
+                closeAllModals() {
+                    Object.values(this.modals).forEach(m => m.close());
+                },
+                showToast(msg, type = 'success') {
+                    const container = document.getElementById('toast-container');
+                    const t = document.createElement('div');
+                    t.className = `toast ${type}`;
+                    
+                    const icon = type === 'success' ? 
+                        `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>` : 
+                        `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+                    
+                    t.innerHTML = `${icon} <span>${this.escapeHTML(msg)}</span>`;
+                    container.appendChild(t);
+                    setTimeout(() => {
+                        t.style.animation = 'fadeOut 0.3s ease forwards';
+                        setTimeout(() => t.remove(), 300);
+                    }, 3000);
+                },
+                escapeHTML(str) {
+                    if (!str) return '';
+                    return String(str).replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag]));
+                },
+                getInstIcon(name) {
+                    return name.substring(0, 2).toUpperCase();
+                },
+                maskValue(val) {
+                    if (!val) return '';
+                    if (!state.data.settings.maskByDefault) return val;
+                    const str = String(val);
+                    if (str.length <= 4) return '••••';
+                    return '•••• '.repeat(Math.ceil((str.length - 4) / 4)) + str.slice(-4);
+                },
+                
+                // --- STREAMING_CHUNK:Rendering Dashboard and Record List... ---
+                renderDashboard() {
+                    const recs = state.data.records;
+                    this.els.stats.total.textContent = recs.length;
+                    this.els.stats.favs.textContent = recs.filter(r => r.favorite).length;
+                    const uniqueInst = new Set(recs.map(r => r.providerId));
+                    this.els.stats.inst.textContent = uniqueInst.size;
+                    
+                    // Update sound icon
+                    this.els.soundBtn.innerHTML = state.data.settings.soundEnabled ? 
+                        `<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>` : 
+                        `<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
+                },
+                
+                renderList() {
+                    this.els.list.innerHTML = '';
+                    const q = state.searchQuery.toLowerCase();
+                    const f = state.filter;
+                    
+                    let filtered = state.data.records.filter(r => {
+                        // Search
+                        const matchStr = `${r.displayName} ${r.institutionName} ${r.primaryFieldValue} ${r.notes || ''}`.toLowerCase();
+                        if (q && !matchStr.includes(q)) return false;
+                        
+                        // Filter
+                        if (f === 'favorites' && !r.favorite) return false;
+                        if (f !== 'all' && f !== 'favorites') {
+                            // Find cat
+                            const inst = INSTITUTIONS.find(i => i.id === r.providerId);
+                            const cat = inst ? inst.cat : 'other';
+                            if (f === 'bank' && cat !== 'bank' && cat !== 'digital') return false;
+                            if (f === 'ewallet' && cat !== 'ewallet') return false;
+                            // Simplistic card filter: check label
+                            if (f === 'card' && !r.primaryFieldLabel.toLowerCase().includes('card')) return false;
+                        }
+                        return true;
+                    });
+
+                    // Sort: Favs first, then by name
+                    filtered.sort((a, b) => {
+                        if (a.favorite && !b.favorite) return -1;
+                        if (!a.favorite && b.favorite) return 1;
+                        return a.displayName.localeCompare(b.displayName);
+                    });
+
+                    if (filtered.length === 0) {
+                        this.els.emptyState.classList.remove('hidden');
+                        document.getElementById('list-header').classList.add('hidden');
+                    } else {
+                        this.els.emptyState.classList.add('hidden');
+                        document.getElementById('list-header').classList.remove('hidden');
+                        
+                        filtered.forEach(r => {
+                            const instName = this.escapeHTML(r.institutionName);
+                            const dispName = this.escapeHTML(r.displayName);
+                            const lbl = this.escapeHTML(r.primaryFieldLabel);
+                            const val = this.escapeHTML(r.primaryFieldValue);
+                            const maskedVal = this.escapeHTML(this.maskValue(r.primaryFieldValue));
+                            const iconTxt = this.getInstIcon(instName);
+
+                            const row = document.createElement('div');
+                            row.className = 'record-row';
+                            row.innerHTML = `
+                                <button class="bubble left-bubble" onclick="App.Logic.copyToClipboard('${dispName}', 'Account Name copied')" aria-label="Copy ${dispName}">
+                                    ${r.favorite ? '<svg class="fav-indicator" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' : ''}
+                                    <span class="bubble-label"><span class="cat-icon">${iconTxt}</span>${instName}</span>
+                                    <span class="bubble-value">${dispName}</span>
+                                </button>
+                                <button class="bubble right-bubble" onclick="App.Logic.copyToClipboard('${val}', '${lbl} copied')" aria-label="Copy ${lbl}">
+                                    <span class="bubble-label">${lbl}</span>
+                                    <span class="bubble-value">${maskedVal}</span>
+                                </button>
+                                <div class="row-actions">
+                                    <button class="icon-btn" onclick="App.UI.openDetails('${r.id}')" aria-label="View Details" title="Details">
+                                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                    </button>
+                                </div>
+                            `;
+                            this.els.list.appendChild(row);
+                        });
+                    }
+                    this.renderDashboard();
+                },
+
+                handleSearch() {
+                    state.searchQuery = this.els.search.value;
+                    state.filter = this.els.filter.value;
+                    this.renderList();
+                    App.resetAutoLock();
+                },
+
+                // --- STREAMING_CHUNK:Form and Details UI handling... ---
+                populateFormSelects() {
+                    const sel = document.getElementById('form-institution');
+                    INSTITUTIONS.forEach(i => {
+                        const opt = document.createElement('option');
+                        opt.value = i.id; opt.textContent = i.name;
+                        document.getElementById(`optgroup-${i.cat === 'bank'?'bank':i.cat==='digital'?'digital':'ewallet'}`).appendChild(opt);
+                    });
+                    
+                    document.getElementById('form-primary-label').addEventListener('change', e => {
+                        document.getElementById('group-custom-label').classList.toggle('hidden', e.target.value !== 'Custom');
+                    });
+                },
+                
+                handleInstitutionChange() {
+                    const val = document.getElementById('form-institution').value;
+                    document.getElementById('group-custom-inst').classList.toggle('hidden', val !== 'custom');
+                },
+
+                addCustomFieldInput(label = '', value = '') {
+                    const id = 'cf-' + Math.random().toString(36).substr(2, 9);
+                    const container = document.getElementById('custom-fields-list');
+                    container.classList.remove('hidden');
+                    
+                    const row = document.createElement('div');
+                    row.className = 'custom-field-row';
+                    row.id = id;
+                    row.innerHTML = `
+                        <input type="text" class="input-control cf-label" placeholder="Label (e.g. Branch)" value="${this.escapeHTML(label)}">
+                        <input type="text" class="input-control cf-value" placeholder="Value" value="${this.escapeHTML(value)}">
+                        <button type="button" class="icon-btn dark" style="color:var(--danger)" onclick="document.getElementById('${id}').remove()">
+                            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    `;
+                    container.appendChild(row);
+                },
+
+                openForm(recordId = null) {
+                    this.els.form.reset();
+                    document.getElementById('form-id').value = '';
+                    document.getElementById('group-custom-inst').classList.add('hidden');
+                    document.getElementById('group-custom-label').classList.add('hidden');
+                    document.getElementById('custom-fields-list').innerHTML = '';
+                    document.getElementById('custom-fields-list').classList.add('hidden');
+
+                    if (recordId) {
+                        const r = state.data.records.find(x => x.id === recordId);
+                        if (!r) return;
+                        document.getElementById('modal-form-title').textContent = 'Edit Record';
+                        document.getElementById('form-id').value = r.id;
+                        
+                        // Institution select
+                        const instSel = document.getElementById('form-institution');
+                        if (INSTITUTIONS.find(i => i.id === r.providerId)) {
+                            instSel.value = r.providerId;
+                        } else {
+                            instSel.value = 'custom';
+                            document.getElementById('group-custom-inst').classList.remove('hidden');
+                            document.getElementById('form-custom-inst').value = r.institutionName;
+                        }
+                        
+                        document.getElementById('form-display-name').value = r.displayName;
+                        
+                        const lblSel = document.getElementById('form-primary-label');
+                        const stdLabels = Array.from(lblSel.options).map(o => o.value);
+                        if (stdLabels.includes(r.primaryFieldLabel)) {
+                            lblSel.value = r.primaryFieldLabel;
+                        } else {
+                            lblSel.value = 'Custom';
+                            document.getElementById('group-custom-label').classList.remove('hidden');
+                            document.getElementById('form-custom-label').value = r.primaryFieldLabel;
+                        }
+                        
+                        document.getElementById('form-primary-value').value = r.primaryFieldValue;
+                        document.getElementById('form-favorite').checked = r.favorite;
+                        document.getElementById('form-account-holder').value = r.accountHolder || '';
+                        document.getElementById('form-notes').value = r.notes || '';
+                        
+                        if (r.customFields) {
+                            r.customFields.forEach(cf => this.addCustomFieldInput(cf.label, cf.value));
+                        }
+                    } else {
+                        document.getElementById('modal-form-title').textContent = 'Add Record';
+                    }
+                    this.modals.addEdit.open();
+                },
+
+                openDetails(recordId) {
+                    const r = state.data.records.find(x => x.id === recordId);
+                    if (!r) return;
+                    
+                    document.getElementById('detail-icon').textContent = this.getInstIcon(r.institutionName);
+                    document.getElementById('detail-title').textContent = r.displayName;
+                    
+                    let html = '';
+                    const addRow = (label, val, copyable = true) => {
+                        if (!val) return;
+                        const vEsc = this.escapeHTML(val);
+                        const cAction = copyable ? `onclick="App.Logic.copyToClipboard('${vEsc}', '${label} copied')"` : '';
+                        const cClass = copyable ? 'detail-copy-area' : '';
+                        const title = copyable ? 'title="Tap to copy"' : '';
+                        
+                        html += `
+                        <div class="detail-row">
+                            <div class="detail-label">${this.escapeHTML(label)}</div>
+                            <div class="detail-value ${cClass}" ${cAction} ${title}>${copyable ? this.escapeHTML(this.maskValue(val)) : vEsc}</div>
+                        </div>`;
+                    };
+
+                    addRow('Institution', r.institutionName, false);
+                    addRow(r.primaryFieldLabel, r.primaryFieldValue);
+                    addRow('Account Holder', r.accountHolder);
+                    
+                    if (r.customFields) {
+                        r.customFields.forEach(cf => addRow(cf.label, cf.value));
+                    }
+                    
+                    if (r.notes) {
+                        html += `
+                        <div class="detail-row" style="flex-direction: column;">
+                            <div class="detail-label">Notes</div>
+                            <div class="detail-value" style="font-size: 0.9rem; white-space: pre-wrap;">${this.escapeHTML(r.notes)}</div>
+                        </div>`;
+                    }
+                    
+                    document.getElementById('detail-content').innerHTML = html;
+                    
+                    document.getElementById('btn-detail-edit').onclick = () => { this.modals.details.close(); this.openForm(r.id); };
+                    document.getElementById('btn-detail-delete').onclick = () => { 
+                        if(confirm(`Are you sure you want to delete "${r.displayName}"?`)) App.Logic.deleteRecord(r.id); 
+                    };
+                    
+                    this.modals.details.open();
+                    App.resetAutoLock();
+                }
+            };
+
+            // --- STREAMING_CHUNK:Core Application Logic (CRUD, Cryptography)... ---
+            // --- 7. CORE LOGIC ---
+            const Logic = {
+                async copyToClipboard(text, successMsg) {
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        AudioEngine.play();
+                        UI.showToast(successMsg);
+                    } catch (err) {
+                        // Fallback
+                        const textArea = document.createElement("textarea");
+                        textArea.value = text;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        try {
+                            document.execCommand('copy');
+                            AudioEngine.play();
+                            UI.showToast(successMsg);
+                        } catch (e) {
+                            UI.showToast("Failed to copy text", 'error');
+                        }
+                        document.body.removeChild(textArea);
+                    }
+                    App.resetAutoLock();
+                },
+
+                async saveRecord() {
+                    const id = document.getElementById('form-id').value;
+                    const instSel = document.getElementById('form-institution').value;
+                    let providerId = instSel;
+                    let institutionName = '';
+                    
+                    if (instSel === 'custom') {
+                        institutionName = document.getElementById('form-custom-inst').value.trim();
+                        providerId = 'custom-' + institutionName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+                    } else {
+                        institutionName = INSTITUTIONS.find(i => i.id === instSel).name;
+                    }
+
+                    const displayName = document.getElementById('form-display-name').value.trim();
+                    let primaryFieldLabel = document.getElementById('form-primary-label').value;
+                    if (primaryFieldLabel === 'Custom') {
+                        primaryFieldLabel = document.getElementById('form-custom-label').value.trim() || 'Identifier';
+                    }
+                    const primaryFieldValue = document.getElementById('form-primary-value').value.trim();
+                    const favorite = document.getElementById('form-favorite').checked;
+                    const accountHolder = document.getElementById('form-account-holder').value.trim();
+                    const notes = document.getElementById('form-notes').value.trim();
+                    
+                    // Parse custom fields
+                    const customFields = [];
+                    document.querySelectorAll('.custom-field-row').forEach(row => {
+                        const l = row.querySelector('.cf-label').value.trim();
+                        const v = row.querySelector('.cf-value').value.trim();
+                        if (l || v) customFields.push({ label: l || 'Field', value: v });
+                    });
+
+                    const record = {
+                        id: id || await Crypto.generateId(),
+                        providerId, institutionName, displayName, primaryFieldLabel, primaryFieldValue,
+                        favorite, accountHolder, notes, customFields,
+                        updatedAt: new Date().toISOString()
+                    };
+                    if (!id) record.createdAt = record.updatedAt;
+
+                    if (id) {
+                        const idx = state.data.records.findIndex(r => r.id === id);
+                        if (idx > -1) state.data.records[idx] = { ...state.data.records[idx], ...record };
+                    } else {
+                        state.data.records.push(record);
+                    }
+
+                    await this.persist();
+                    UI.modals.addEdit.close();
+                    UI.renderList();
+                    UI.showToast("Record saved successfully");
+                },
+
+                async deleteRecord(id) {
+                    state.data.records = state.data.records.filter(r => r.id !== id);
+                    await this.persist();
+                    UI.modals.details.close();
+                    UI.renderList();
+                    UI.showToast("Record deleted");
+                },
+
+                updateSettings() {
+                    state.data.settings.soundEnabled = document.getElementById('setting-sound').checked;
+                    state.data.settings.maskByDefault = document.getElementById('setting-mask').checked;
+                    state.data.settings.autoLockMinutes = parseInt(document.getElementById('setting-autolock').value);
+                    
+                    this.persist().then(() => {
+                        UI.renderList();
+                        App.resetAutoLock();
+                    });
+                },
+
+                async persist() {
+                    try {
+                        const encrypted = await Crypto.encrypt(state.data);
+                        await Storage.set('vault_data', { iv: encrypted.iv, cipher: encrypted.cipher });
+                    } catch (e) {
+                        UI.showToast("Failed to save to secure storage", "error");
+                        console.error(e);
+                    }
+                },
+
+                // --- STREAMING_CHUNK:Implementing Export and Import logic... ---
+                exportJSON() {
+                    const exportData = {
+                        app: "PesoVault PH",
+                        formatVersion: 1,
+                        exportedAt: new Date().toISOString(),
+                        recordCount: state.data.records.length,
+                        records: state.data.records,
+                        settings: state.data.settings
+                    };
+                    
+                    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `pesovault-backup-${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    UI.showToast("Backup exported successfully");
+                    UI.modals.settings.close();
+                    App.resetAutoLock();
+                },
+
+                handleImportFile(event) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        try {
+                            const imported = JSON.parse(e.target.result);
+                            if (imported.app !== "PesoVault PH" || !Array.isArray(imported.records)) {
+                                throw new Error("Invalid backup format");
+                            }
+                            
+                            if (confirm(`Import ${imported.records.length} records? This will MERGE with existing records based on IDs.`)) {
+                                let newCount = 0;
+                                imported.records.forEach(impRec => {
+                                    const exIdx = state.data.records.findIndex(r => r.id === impRec.id);
+                                    if (exIdx > -1) {
+                                        // Update if newer
+                                        if (new Date(impRec.updatedAt) > new Date(state.data.records[exIdx].updatedAt)) {
+                                            state.data.records[exIdx] = impRec;
+                                        }
+                                    } else {
+                                        state.data.records.push(impRec);
+                                        newCount++;
+                                    }
+                                });
+                                
+                                if(imported.settings) state.data.settings = {...state.data.settings, ...imported.settings};
+                                
+                                await this.persist();
+                                App.syncSettingsToUI();
+                                UI.renderList();
+                                UI.showToast(`Import complete. Added ${newCount} new records.`);
+                            }
+                        } catch (err) {
+                            UI.showToast("Import failed: Invalid file", "error");
+                        }
+                        event.target.value = ''; // reset
+                    };
+                    reader.readAsText(file);
+                },
+
+                async destroyVault() {
+                    if (confirm("WARNING: This will permanently delete your encrypted vault, settings, and all records. This cannot be undone. Type 'DELETE' to confirm.")) {
+                        const conf = prompt("Type 'DELETE' to confirm destruction:");
+                        if (conf === 'DELETE') {
+                            await Storage.clear();
+                            location.reload();
+                        }
+                    }
+                }
+            };
+
+            // --- STREAMING_CHUNK:App Initialization and Auth Flow... ---
+            return {
+                UI, Logic, Crypto,
+                async init() {
+                    try {
+                        await Storage.init();
+                        UI.init();
+                        
+                        const meta = await Storage.get('vault_meta');
+                        if (meta && meta.salt) {
+                            // Vault exists, request unlock
+                            UI.els.authTitle.textContent = "Unlock Vault";
+                            UI.els.authDesc.textContent = "Enter your master passphrase to access your data.";
+                            UI.els.authBtnText.textContent = "Unlock Vault";
+                            UI.els.authConfirmGrp.style.display = 'none';
+                            UI.els.authConfirm.removeAttribute('required');
+                        } else {
+                            // New setup
+                            UI.els.authTitle.textContent = "Initialize Vault";
+                            UI.els.authDesc.textContent = "Create a strong master passphrase. This encrypts all your data locally.";
+                            UI.els.authBtnText.textContent = "Create Vault";
+                            UI.els.authConfirmGrp.style.display = 'block';
+                            UI.els.authConfirm.setAttribute('required', 'true');
+                        }
+                        
+                        // Add basic interactions for auto-lock reset
+                        ['click', 'keypress', 'touchstart'].forEach(evt => 
+                            document.addEventListener(evt, () => this.resetAutoLock(), { passive: true })
+                        );
+                        
+                    } catch (e) {
+                        UI.els.authError.textContent = "Fatal: Local storage initialization failed. Please ensure you are not in private browsing mode.";
+                    }
+                },
+
+                async handleAuth() {
+                    const pw = UI.els.authPassword.value;
+                    const conf = UI.els.authConfirm.value;
+                    UI.els.authError.textContent = '';
+
+                    try {
+                        const meta = await Storage.get('vault_meta');
+                        
+                        if (!meta) {
+                            // Setup
+                            if (pw !== conf) throw new Error("Passphrases do not match.");
+                            if (pw.length < 6) throw new Error("Passphrase too short.");
+                            
+                            const salt = crypto.getRandomValues(new Uint8Array(16));
+                            state.key = await Crypto.deriveKey(pw, salt);
+                            
+                            // Initialize empty vault
+                            await Logic.persist();
+                            await Storage.set('vault_meta', { salt: salt });
+                            
+                        } else {
+                            // Unlock
+                            state.key = await Crypto.deriveKey(pw, meta.salt);
+                            const dataObj = await Storage.get('vault_data');
+                            if (dataObj) {
+                                try {
+                                    state.data = await Crypto.decrypt(dataObj.cipher, dataObj.iv);
+                                } catch (e) {
+                                    state.key = null;
+                                    throw new Error("Incorrect passphrase or corrupted data.");
+                                }
+                            }
+                        }
+
+                        // Success
+                        state.unlocked = true;
+                        UI.els.authPassword.value = '';
+                        UI.els.authConfirm.value = '';
+                        UI.els.authView.classList.add('hidden');
+                        UI.els.appView.classList.remove('hidden');
+                        
+                        // Ensure data structure integrity
+                        if(!state.data.records) state.data.records = [];
+                        if(!state.data.settings) state.data.settings = { soundEnabled: true, maskByDefault: true, autoLockMinutes: 5 };
+                        
+                        this.syncSettingsToUI();
+                        UI.renderList();
+                        this.resetAutoLock();
+
+                    } catch (e) {
+                        UI.els.authError.textContent = e.message || "Authentication failed.";
+                    }
+                },
+                
+                syncSettingsToUI() {
+                    document.getElementById('setting-sound').checked = state.data.settings.soundEnabled;
+                    document.getElementById('setting-mask').checked = state.data.settings.maskByDefault;
+                    document.getElementById('setting-autolock').value = state.data.settings.autoLockMinutes;
+                },
+
+                lockVault() {
+                    state.unlocked = false;
+                    state.key = null;
+                    state.data = { records: [], settings: {} }; // Clear mem
+                    UI.els.appView.classList.add('hidden');
+                    UI.els.authView.classList.remove('hidden');
+                    UI.closeAllModals();
+                    UI.els.authPassword.focus();
+                    clearTimeout(state.lockTimer);
+                },
+
+                resetAutoLock() {
+                    if (!state.unlocked) return;
+                    clearTimeout(state.lockTimer);
+                    const mins = state.data.settings.autoLockMinutes;
+                    if (mins > 0) {
+                        state.lockTimer = setTimeout(() => this.lockVault(), mins * 60 * 1000);
+                    }
+                },
+                
+                toggleSound() {
+                    state.data.settings.soundEnabled = !state.data.settings.soundEnabled;
+                    document.getElementById('setting-sound').checked = state.data.settings.soundEnabled;
+                    Logic.persist().then(() => UI.renderDashboard());
+                }
+            };
+        })();
+
+        // Start App
+        window.addEventListener('DOMContentLoaded', () => App.init());
+    </script>
+</body>
+</html>
