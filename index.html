@@ -1,0 +1,3250 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PesoVault PH — Personal Financial & Biller Vault</title>
+  <!-- Custom SVG Favicon matching PesoVault PH identity -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B132B'/%3E%3Crect x='4' y='4' width='56' height='56' rx='10' fill='none' stroke='%23C59B27' stroke-width='2' stroke-opacity='0.5'/%3E%3Cpath d='M20 46V18h12.5c6.5 0 10.5 3.4 10.5 8.8 0 5.5-4 8.9-10.5 8.9H26v10.3h-6zm6-15.2h6.2c3.2 0 5-1.5 5-3.9 0-2.4-1.8-3.8-5-3.8H26v7.7z' fill='%23F8FAFC'/%3E%3Crect x='16' y='23' width='30' height='2.6' rx='1.3' fill='%23C59B27'/%3E%3Crect x='16' y='28' width='30' height='2.6' rx='1.3' fill='%23C59B27'/%3E%3Ccircle cx='46' cy='44' r='7' fill='%23059669'/%3E%3Cpath d='M43 44l2 2 4-4' stroke='%23ffffff' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              950: '#060A17',
+              900: '#0B132B',
+              800: '#131F42',
+              700: '#1D2E5C',
+            },
+            ivory: {
+              50: '#FCFBF9',
+              100: '#F6F4EE',
+              200: '#EAE6DC',
+              300: '#DCD6C8',
+            },
+            emerald: {
+              500: '#10B981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065F46',
+            },
+            gold: {
+              400: '#E0B841',
+              500: '#C59B27',
+              600: '#A17C1B',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --bg-main: #F6F4EE;
+      --navy-header: #0B132B;
+      --emerald-accent: #059669;
+      --gold-accent: #C59B27;
+    }
+    body {
+      background-color: var(--bg-main);
+      color: #0F172A;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    .copy-bubble {
+      transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease, background-color 0.14s ease;
+    }
+    .copy-bubble:hover {
+      border-color: #059669;
+      box-shadow: 0 4px 12px -2px rgba(5, 150, 105, 0.12);
+    }
+    .copy-bubble:active {
+      transform: scale(0.988);
+    }
+    .copy-bubble:focus-visible {
+      outline: 2px solid #059669;
+      outline-offset: 2px;
+    }
+    .bubble-copied {
+      border-color: #059669 !important;
+      background-color: #ECFDF5 !important;
+    }
+    .modal-backdrop {
+      background-color: rgba(11, 19, 43, 0.68);
+      backdrop-filter: blur(3px);
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #EFECE4;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-full flex flex-col">
+
+  <!-- ===================================================================== -->
+  <!-- AUTHENTICATION & ENCRYPTED VAULT LOCK SCREEN                          -->
+  <!-- ===================================================================== -->
+  <div id="vaultAuthScreen" class="fixed inset-0 z-50 bg-navy-950 text-white flex flex-col items-center justify-center p-4 overflow-y-auto">
+    <div class="w-full max-w-md bg-navy-900 border border-navy-800 rounded-2xl shadow-2xl overflow-hidden my-auto">
+      <div class="p-6 sm:p-8 border-b border-navy-800 text-center">
+        <div class="w-14 h-14 rounded-2xl bg-navy-800 border border-gold-500/50 flex items-center justify-center mx-auto mb-4 shadow-inner">
+          <span class="text-gold-400 font-bold text-2xl font-mono">₱</span>
+        </div>
+        <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white">PesoVault PH</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">Encrypted Philippine Bank & Biller Account Directory</p>
+        <div class="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-700/50 text-[11px] text-emerald-300 font-medium">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          <span>AES-GCM 256-Bit • PBKDF2 • Local IndexedDB</span>
+        </div>
+      </div>
+
+      <form id="vaultAuthForm" class="p-6 sm:p-8 space-y-4" onsubmit="VaultApp.handleAuthSubmit(event)">
+        <div id="authModeNotice" class="p-3.5 rounded-xl bg-navy-950/90 border border-navy-800 text-xs text-slate-300 leading-relaxed">
+          Checking local encrypted vault status...
+        </div>
+
+        <div id="authErrorBox" class="hidden p-3 rounded-xl bg-rose-950/90 border border-rose-700 text-rose-200 text-xs font-medium"></div>
+
+        <div>
+          <label for="authPassphrase" id="authPassphraseLabel" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+            Master Passphrase
+          </label>
+          <div class="relative">
+            <input
+              type="password"
+              id="authPassphrase"
+              required
+              autocomplete="current-password"
+              placeholder="Enter your master passphrase..."
+              class="w-full px-4 py-3 rounded-xl bg-navy-950 border border-navy-700 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            />
+            <button
+              type="button"
+              onclick="VaultApp.togglePassphraseVisibility('authPassphrase')"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1"
+              aria-label="Toggle Passphrase Visibility"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="authConfirmContainer" class="hidden">
+          <label for="authPassphraseConfirm" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+            Confirm Master Passphrase
+          </label>
+          <input
+            type="password"
+            id="authPassphraseConfirm"
+            autocomplete="new-password"
+            placeholder="Re-enter master passphrase..."
+            class="w-full px-4 py-3 rounded-xl bg-navy-950 border border-navy-700 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+          />
+        </div>
+
+        <div id="authSeedStarterOption" class="hidden pt-1">
+          <label class="flex items-start gap-2.5 cursor-pointer select-none text-xs text-slate-300">
+            <input type="checkbox" id="authSeedSampleCheckbox" checked class="mt-0.5 rounded border-navy-700 bg-navy-950 text-emerald-500 focus:ring-emerald-500" />
+            <span>Initialize with starter Philippine Bank & Biller records (PLDT, VECO, Meralco, MariBank, BDO, GCash, SSS, Pag-IBIG) so you can test tap-to-copy immediately.</span>
+          </label>
+        </div>
+
+        <button
+          type="submit"
+          id="authSubmitBtn"
+          class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-lg shadow-emerald-950/50 transition flex items-center justify-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+          <span id="authSubmitBtnText">Unlock Vault</span>
+        </button>
+
+        <div class="pt-3 border-t border-navy-800 flex items-center justify-between text-[11px] text-slate-400">
+          <span>Zero Server Transmission</span>
+          <button type="button" onclick="VaultApp.openResetVaultConfirmFromLock()" class="text-rose-400 hover:text-rose-300 underline">
+            Reset / Erase Vault
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MAIN APPLICATION SHELL                                                -->
+  <!-- ===================================================================== -->
+  <div id="vaultMainApp" class="hidden flex-1 flex flex-col min-h-screen">
+
+    <!-- Dark Navy Premium Header -->
+    <header class="bg-navy-900 text-white border-b border-navy-800 sticky top-0 z-30 shadow-md">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+        <!-- Brand Identity -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-navy-800 border border-gold-500/40 flex items-center justify-center shrink-0 shadow-inner">
+            <span class="text-gold-400 font-bold text-xl font-mono">₱</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-base sm:text-lg font-bold tracking-tight text-white">PesoVault PH</h1>
+              <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">AES-GCM</span>
+            </div>
+            <p class="text-xs text-slate-400 hidden sm:block">Tap Left Bubble to Copy Provider/Biller • Tap Right Bubble to Copy Account Number</p>
+          </div>
+        </div>
+
+        <!-- Header Actions -->
+        <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap">
+          <!-- Global Mask Toggle -->
+          <button
+            type="button"
+            id="headerMaskToggleBtn"
+            onclick="VaultApp.toggleGlobalMasking()"
+            class="px-3 py-2 rounded-xl bg-navy-800 hover:bg-navy-700 border border-navy-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition"
+            title="Toggle Account Number Masking"
+          >
+            <svg id="headerMaskIcon" class="w-4 h-4 text-gold-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+            <span id="headerMaskLabel" class="hidden sm:inline">Masked</span>
+          </button>
+
+          <!-- Custom Biller Directory Manager -->
+          <button
+            type="button"
+            onclick="VaultApp.openDirectoryModal()"
+            class="px-3 py-2 rounded-xl bg-navy-800 hover:bg-navy-700 border border-navy-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition"
+            title="Manage Philippine Biller & Bank Directory"
+          >
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            <span class="hidden md:inline">Directory</span>
+          </button>
+
+          <!-- Settings & Backup -->
+          <button
+            type="button"
+            onclick="VaultApp.openSettingsModal()"
+            class="px-3 py-2 rounded-xl bg-navy-800 hover:bg-navy-700 border border-navy-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition"
+            title="Vault Settings, Sound, & Encrypted Backup"
+          >
+            <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span class="hidden md:inline">Settings</span>
+          </button>
+
+          <!-- Lock Vault Now -->
+          <button
+            type="button"
+            onclick="VaultApp.lockVault('Vault locked manually.')"
+            class="px-3 py-2 rounded-xl bg-navy-800 hover:bg-rose-950/80 border border-navy-700 hover:border-rose-700 text-xs font-medium text-slate-200 hover:text-rose-200 flex items-center gap-1.5 transition"
+            title="Lock Encrypted Vault"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            <span class="hidden sm:inline">Lock</span>
+          </button>
+
+          <!-- Add New Record Primary CTA -->
+          <button
+            type="button"
+            onclick="VaultApp.openRecordModal()"
+            class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold shadow-sm flex items-center gap-1.5 transition"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            <span>Add Record</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Dashboard Content -->
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+      <!-- Live Dashboard Statistics (Section 7) -->
+      <section aria-label="Vault Statistics" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div class="bg-white rounded-2xl p-4 border border-ivory-300 shadow-sm flex items-center justify-between">
+          <div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Total Records</div>
+            <div id="statTotalRecords" class="text-2xl sm:text-3xl font-bold text-navy-900 mt-1 font-mono">0</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-navy-900/5 border border-navy-900/10 flex items-center justify-center text-navy-900">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 border border-ivory-300 shadow-sm flex items-center justify-between">
+          <div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Favorites</div>
+            <div id="statFavorites" class="text-2xl sm:text-3xl font-bold text-gold-600 mt-1 font-mono">0</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/80 flex items-center justify-center text-gold-500">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 border border-ivory-300 shadow-sm flex items-center justify-between">
+          <div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Unique Providers</div>
+            <div id="statUniqueProviders" class="text-2xl sm:text-3xl font-bold text-navy-900 mt-1 font-mono">0</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200/80 flex items-center justify-center text-blue-700">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/></svg>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 border border-ivory-300 shadow-sm flex items-center justify-between">
+          <div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Biller Records</div>
+            <div id="statBillerRecords" class="text-2xl sm:text-3xl font-bold text-emerald-700 mt-1 font-mono">0</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-center text-emerald-700">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- Search and Multi-Level Filter Bar (Section 7) -->
+      <section aria-label="Search and Filters" class="bg-white rounded-2xl p-4 sm:p-5 border border-ivory-300 shadow-sm space-y-4">
+        <div class="flex flex-col md:flex-row items-stretch md:items-center gap-3">
+          <!-- Instant Search Input -->
+          <div class="relative flex-1">
+            <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input
+              type="search"
+              id="recordSearchInput"
+              oninput="VaultApp.handleSearchInput(this.value)"
+              placeholder="Search provider, biller (PLDT, VECO, Meralco, SSS, MariBank), alias, nickname, or account number..."
+              aria-label="Search saved records"
+              class="w-full pl-10 pr-9 py-2.5 text-sm bg-ivory-50 border border-ivory-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:bg-white transition"
+            />
+            <button
+              type="button"
+              id="clearSearchBtn"
+              onclick="VaultApp.handleSearchInput('')"
+              class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-xs font-bold px-1.5 py-0.5"
+              title="Clear search"
+            >✕</button>
+          </div>
+
+          <!-- Favorites Combinable Filter Toggle -->
+          <div class="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              id="favFilterToggleBtn"
+              onclick="VaultApp.toggleFavoritesOnlyFilter()"
+              aria-pressed="false"
+              class="px-3.5 py-2.5 rounded-xl border border-ivory-300 bg-ivory-50 hover:bg-ivory-100 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition"
+            >
+              <svg class="w-4 h-4 text-gold-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <span>Favorites Only</span>
+            </button>
+
+            <!-- Dropdown Category Filter for quick jump on mobile/desktop -->
+            <select
+              id="categorySelectFilter"
+              onchange="VaultApp.setCategoryFilter(this.value)"
+              aria-label="Filter by Category or Biller Type"
+              class="px-3 py-2.5 rounded-xl border border-ivory-300 bg-ivory-50 text-xs font-semibold text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+            >
+              <option value="ALL">All Records</option>
+              <option value="FAVORITES">★ Favorites</option>
+              <optgroup label="Financial Institutions">
+                <option value="CAT_bank">Banks (Universal / Commercial / Thrift)</option>
+                <option value="CAT_digital_bank">Digital Banks (MariBank, GoTyme, Maya...)</option>
+                <option value="CAT_ewallet">E-Wallets (GCash, Maya, GrabPay...)</option>
+                <option value="CAT_credit_card">Credit Cards</option>
+              </optgroup>
+              <optgroup label="Billers & Utilities">
+                <option value="CAT_biller">All Billers (Built-in & Custom)</option>
+                <option value="BILLER_electricity">⚡ Electricity (Meralco, VECO, Davao Light...)</option>
+                <option value="BILLER_water">💧 Water Utilities (Maynilad, Manila Water...)</option>
+                <option value="BILLER_telecommunications">🌐 Telecom & Internet (PLDT, Globe, Converge...)</option>
+                <option value="BILLER_cable">📺 Cable & TV (Cignal, Sky Cable...)</option>
+                <option value="BILLER_government">🏛️ Government (SSS, Pag-IBIG, PhilHealth, BIR...)</option>
+                <option value="BILLER_loan">💳 Loans & Financing (Home Credit, Billease...)</option>
+                <option value="BILLER_insurance">🛡️ Insurance & Healthcare (Sun Life, Maxicare...)</option>
+                <option value="BILLER_tollway">🛣️ Tollways & RFID (Autosweep, Easytrip)</option>
+                <option value="BILLER_education">🎓 Education & Schools</option>
+                <option value="BILLER_property">🏢 Property & Real Estate</option>
+                <option value="BILLER_healthcare">🏥 Hospitals & Medical</option>
+                <option value="BILLER_other">📋 Other Billers</option>
+              </optgroup>
+              <optgroup label="Other">
+                <option value="CAT_other">Other Records</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+        <!-- Horizontal Filter Pills -->
+        <div id="filterPillsBar" class="flex items-center gap-1.5 overflow-x-auto pb-1 pt-0.5 text-xs">
+          <!-- Populated dynamically by VaultApp.renderFilterPills() -->
+        </div>
+      </section>
+
+      <!-- Active Filter Summary & Quick Instructions -->
+      <div class="flex flex-wrap items-center justify-between gap-2 px-1 text-xs text-slate-600">
+        <div id="recordsCountSummary" class="font-medium">Showing all records</div>
+        <div class="flex items-center gap-3">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+            <span>Tap <strong>Left Bubble</strong> = Copy Provider/Biller</span>
+          </span>
+          <span class="inline-flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-navy-800"></span>
+            <span>Tap <strong>Right Bubble</strong> = Copy Account Number</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Two-Bubble Record List Container (Sections 2 & 8) -->
+      <section id="recordsListContainer" aria-label="Saved Accounts and Billers" class="space-y-3.5 pb-12">
+        <!-- Populated dynamically by VaultApp.renderRecords() -->
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-ivory-300 py-4 px-4 sm:px-6 text-xs text-slate-500 mt-auto">
+      <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div>
+          <strong class="text-navy-900">PesoVault PH</strong> • Client-Side AES-GCM Encrypted Vault • Directory contains <span id="footerDirectoryCount" class="font-semibold text-navy-900">0</span> verified PH banks & billers
+        </div>
+        <div class="flex items-center gap-3">
+          <button type="button" onclick="VaultApp.openDirectoryModal()" class="text-emerald-700 hover:underline font-medium">+ Add Custom Biller</button>
+          <span>•</span>
+          <button type="button" onclick="VaultApp.downloadStandaloneHTML()" class="text-navy-900 hover:underline font-semibold">Download PesoVault_PH.html</button>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- UNIVERSAL MODAL DIALOG CONTAINER                                      -->
+  <!-- ===================================================================== -->
+  <div id="modalOverlay" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-5 modal-backdrop overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="modalHeaderTitle">
+    <div id="modalBox" class="bg-white border border-ivory-300 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col">
+      <div class="px-5 py-4 bg-navy-900 text-white flex items-center justify-between shrink-0">
+        <h2 id="modalHeaderTitle" class="text-base font-bold tracking-tight">Modal Title</h2>
+        <button type="button" onclick="VaultApp.closeModal()" class="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-navy-800 focus:outline-none" aria-label="Close Dialog">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="modalContentBody" class="p-5 sm:p-6 overflow-y-auto flex-1 space-y-4 text-sm text-slate-700"></div>
+      <div id="modalContentFooter" class="px-5 py-3.5 bg-ivory-100 border-t border-ivory-300 flex flex-wrap items-center justify-end gap-2.5 shrink-0"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Stack -->
+  <div id="toastStack" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none" aria-live="polite"></div>
+
+  <script>
+    /*************************************************************************
+     * 1. BUILT-IN PHILIPPINE BANK, E-WALLET, CARD, & BILLER SEED DIRECTORY
+     * Includes MariBank (formerly SeaBank), all major PH banks, digital banks,
+     * e-wallets, credit cards, utilities, telcos, and government agencies.
+     *************************************************************************/
+    const BUILTIN_DIRECTORY = [
+      // =====================================================================
+      // A. UNIVERSAL, COMMERCIAL, & THRIFT BANKS (category: 'bank')
+      // =====================================================================
+      { id: 'bank_bdo', name: 'BDO Unibank', category: 'bank', billerType: null, aliases: ['BDO', 'Banco de Oro', 'BDO Network Bank'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_bpi', name: 'Bank of the Philippine Islands (BPI)', category: 'bank', billerType: null, aliases: ['BPI', 'BPI Family Savings', 'BPI Direct'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_metrobank', name: 'Metrobank', category: 'bank', billerType: null, aliases: ['MBTC', 'Metropolitan Bank and Trust Company'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_landbank', name: 'Land Bank of the Philippines', category: 'bank', billerType: null, aliases: ['LandBank', 'LBP'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_pnb', name: 'Philippine National Bank (PNB)', category: 'bank', billerType: null, aliases: ['PNB', 'Allied Bank'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_unionbank', name: 'UnionBank of the Philippines', category: 'bank', billerType: null, aliases: ['UnionBank', 'UBP', 'Union Bank'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_rcbc', name: 'RCBC', category: 'bank', billerType: null, aliases: ['Rizal Commercial Banking Corporation', 'RCBC OneAccount'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_security', name: 'Security Bank', category: 'bank', billerType: null, aliases: ['SBC', 'Security Bank Corporation'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_chinabank', name: 'China Banking Corporation (Chinabank)', category: 'bank', billerType: null, aliases: ['Chinabank', 'CBC', 'China Bank Savings', 'CBS'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_eastwest', name: 'EastWest Bank', category: 'bank', billerType: null, aliases: ['EWB', 'EastWest Banking Corporation'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_dbp', name: 'Development Bank of the Philippines (DBP)', category: 'bank', billerType: null, aliases: ['DBP'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_aub', name: 'Asia United Bank (AUB)', category: 'bank', billerType: null, aliases: ['AUB', 'HelloMoney'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_psbank', name: 'Philippine Savings Bank (PSBank)', category: 'bank', billerType: null, aliases: ['PSBank', 'PSB'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_pbcom', name: 'Philippine Bank of Communications (PBCOM)', category: 'bank', billerType: null, aliases: ['PBCOM', 'PBCom'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_bankcom', name: 'Bank of Commerce (BankCom)', category: 'bank', billerType: null, aliases: ['BankCom', 'San Miguel Bank'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_robinsons', name: 'Robinsons Bank', category: 'bank', billerType: null, aliases: ['RBank', 'BPI Robinsons Bank'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_maybank', name: 'Maybank Philippines', category: 'bank', billerType: null, aliases: ['Maybank', 'MPI'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_philtrust', name: 'Philtrust Bank', category: 'bank', billerType: null, aliases: ['Philippine Trust Company'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_veterans', name: 'Philippine Veterans Bank (PVB)', category: 'bank', billerType: null, aliases: ['PVB', 'Veterans Bank'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_sterling', name: 'Sterling Bank of Asia', category: 'bank', billerType: null, aliases: ['Sterling Bank'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_pbb', name: 'Philippine Business Bank (PBB)', category: 'bank', billerType: null, aliases: ['PBB'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_ctbc', name: 'CTBC Bank Philippines', category: 'bank', billerType: null, aliases: ['CTBC', 'Chinatrust'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_hsbc', name: 'HSBC Philippines', category: 'bank', billerType: null, aliases: ['HSBC', 'Hongkong and Shanghai Banking Corp'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_stanchart', name: 'Standard Chartered Bank Philippines', category: 'bank', billerType: null, aliases: ['Standard Chartered', 'SCB'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_equicom', name: 'Equicom Savings Bank', category: 'bank', billerType: null, aliases: ['Equicom', 'EqB'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_producers', name: 'Producers Savings Bank', category: 'bank', billerType: null, aliases: ['Producers Bank'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_citystate', name: 'Citystate Savings Bank', category: 'bank', billerType: null, aliases: ['CSBank', 'Citystate'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_banko', name: 'BPI Direct BanKO', category: 'bank', billerType: null, aliases: ['BanKO'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_card', name: 'CARD Bank', category: 'bank', billerType: null, aliases: ['CARD SME Bank', 'CARD MRI'], active: true, lastVerified: '2026-10' },
+      { id: 'bank_queenbank', name: 'Queen City Development Bank (Queenbank)', category: 'bank', billerType: null, aliases: ['Queenbank'], active: true, lastVerified: '2026-10' },
+
+      // =====================================================================
+      // B. DIGITAL BANKS (category: 'digital_bank') — SeaBank updated to MariBank
+      // =====================================================================
+      { id: 'dig_maribank', name: 'MariBank', category: 'digital_bank', billerType: null, aliases: ['SeaBank', 'SeaBank Philippines', 'MariBank PH', 'Maribank (formerly SeaBank)'], active: true, lastVerified: '2026-10' },
+      { id: 'dig_gotyme', name: 'GoTyme Bank', category: 'digital_bank', billerType: null, aliases: ['GoTyme', 'Go Save'], active: true, lastVerified: '2026-10' },
+      { id: 'dig_mayabank', name: 'Maya Bank', category: 'digital_bank', billerType: null, aliases: ['Maya Savings', 'Maya Personal Goal', 'Maya Time Deposit'], active: true, lastVerified: '2026-10' },
+      { id: 'dig_tonik', name: 'Tonik Digital Bank', category: 'digital_bank', billerType: null, aliases: ['Tonik', 'Tonik Stash'], active: true, lastVerified: '2026-10' },
+      { id: 'dig_uniondigital', name: 'UnionDigital Bank', category: 'digital_bank', billerType: null, aliases: ['UnionDigital', 'UD Bank', 'UD'], active: true, lastVerified: '2026-10' },
+      { id: 'dig_uno', name: 'UNO Digital Bank', category: 'digital_bank', billerType: null, aliases: ['UNO Bank', 'UNO'], active: true, lastVerified: '2026-10' },
+      { id: 'dig_ofbank', name: 'Overseas Filipino Bank (OFBank)', category: 'digital_bank', billerType: null, aliases: ['OFBank', 'LandBank OFBank'], active: true, lastVerified: '2026-10' },
+      { id: 'dig_cimb', name: 'CIMB Bank Philippines', category: 'digital_bank', billerType: null, aliases: ['CIMB', 'GSave', 'UpSave', 'Fast Plus'], active: true, lastVerified: '2026-10' },
+      { id: 'dig_diskartech', name: 'DiskarTech (RCBC)', category: 'digital_bank', billerType: null, aliases: ['DiskarTech'], active: true, lastVerified: '2026-10' },
+      { id: 'dig_komo', name: 'Komo (EastWest)', category: 'digital_bank', billerType: null, aliases: ['Komo', 'EastWest Komo'], active: true, lastVerified: '2026-10' },
+      { id: 'dig_ownbank', name: 'OwnBank', category: 'digital_bank', billerType: null, aliases: ['OwnBank Cavite', 'Own It'], active: true, lastVerified: '2026-10' },
+      { id: 'dig_netbank', name: 'Netbank Mobile', category: 'digital_bank', billerType: null, aliases: ['Netbank'], active: true, lastVerified: '2026-10' },
+
+      // =====================================================================
+      // C. E-WALLETS & DIGITAL PAYMENT PROVIDERS (category: 'ewallet')
+      // =====================================================================
+      { id: 'ew_gcash', name: 'GCash', category: 'ewallet', billerType: null, aliases: ['G-Xchange', 'MyNT', 'GCash Wallet'], active: true, lastVerified: '2026-10' },
+      { id: 'ew_maya', name: 'Maya Wallet', category: 'ewallet', billerType: null, aliases: ['Maya', 'PayMaya'], active: true, lastVerified: '2026-10' },
+      { id: 'ew_grabpay', name: 'GrabPay', category: 'ewallet', billerType: null, aliases: ['Grab Wallet', 'GrabPay PH'], active: true, lastVerified: '2026-10' },
+      { id: 'ew_shopeepay', name: 'ShopeePay', category: 'ewallet', billerType: null, aliases: ['Shopee Wallet'], active: true, lastVerified: '2026-10' },
+      { id: 'ew_coins', name: 'Coins.ph', category: 'ewallet', billerType: null, aliases: ['Coins', 'DCPay'], active: true, lastVerified: '2026-10' },
+      { id: 'ew_palawanpay', name: 'PalawanPay', category: 'ewallet', billerType: null, aliases: ['Palawan Express', 'Palawan Pawnshop Wallet'], active: true, lastVerified: '2026-10' },
+      { id: 'ew_cebuana', name: 'Cebuana Lhuillier (e-Cebuana)', category: 'ewallet', billerType: null, aliases: ['e-Cebuana', 'Cebuana Quikz'], active: true, lastVerified: '2026-10' },
+      { id: 'ew_mlwallet', name: 'ML Wallet (M Lhuillier)', category: 'ewallet', billerType: null, aliases: ['M Lhuillier', 'MLhuillier', 'MCash'], active: true, lastVerified: '2026-10' },
+      { id: 'ew_tayocash', name: 'TayoCash', category: 'ewallet', billerType: null, aliases: ['TayoCash Wallet'], active: true, lastVerified: '2026-10' },
+      { id: 'ew_starpay', name: 'StarPay', category: 'ewallet', billerType: null, aliases: ['StarPay Wallet'], active: true, lastVerified: '2026-10' },
+      { id: 'ew_lazada', name: 'Lazada Wallet', category: 'ewallet', billerType: null, aliases: ['Lazada Pay'], active: true, lastVerified: '2026-10' },
+      { id: 'ew_cliqq', name: 'CLiQQ Pay (7-Eleven)', category: 'ewallet', billerType: null, aliases: ['CLiQQ', '7-Eleven Wallet'], active: true, lastVerified: '2026-10' },
+      { id: 'ew_toktok', name: 'TokTok Wallet', category: 'ewallet', billerType: null, aliases: ['TokTok'], active: true, lastVerified: '2026-10' },
+      { id: 'ew_vybe', name: 'VYBE by BPI', category: 'ewallet', billerType: null, aliases: ['VYBE', 'BPI VYBE'], active: true, lastVerified: '2026-10' },
+      { id: 'ew_wise', name: 'Wise Philippines', category: 'ewallet', billerType: null, aliases: ['Wise', 'TransferWise'], active: true, lastVerified: '2026-10' },
+      { id: 'ew_paypal', name: 'PayPal Philippines', category: 'ewallet', billerType: null, aliases: ['PayPal'], active: true, lastVerified: '2026-10' },
+
+      // =====================================================================
+      // D. CREDIT CARDS (category: 'credit_card')
+      // =====================================================================
+      { id: 'cc_bdo', name: 'BDO Credit Card', category: 'credit_card', billerType: 'loan', aliases: ['BDO Mastercard', 'BDO Visa', 'BDO Amex', 'BDO JCB', 'BDO Diners'], active: true, lastVerified: '2026-10' },
+      { id: 'cc_bpi', name: 'BPI Credit Card', category: 'credit_card', billerType: 'loan', aliases: ['BPI Express Credit', 'BPI Cards'], active: true, lastVerified: '2026-10' },
+      { id: 'cc_metrobank', name: 'Metrobank Credit Card', category: 'credit_card', billerType: 'loan', aliases: ['MCC', 'Metrobank Card'], active: true, lastVerified: '2026-10' },
+      { id: 'cc_unionbank', name: 'UnionBank Credit Card', category: 'credit_card', billerType: 'loan', aliases: ['UnionBank CC', 'UB CC', 'Citibank PH Credit Card'], active: true, lastVerified: '2026-10' },
+      { id: 'cc_rcbc', name: 'RCBC Credit Card (Bankard)', category: 'credit_card', billerType: 'loan', aliases: ['RCBC Bankard', 'Bankard'], active: true, lastVerified: '2026-10' },
+      { id: 'cc_security', name: 'Security Bank Credit Card', category: 'credit_card', billerType: 'loan', aliases: ['SBC Credit Card', 'Security Bank Mastercard'], active: true, lastVerified: '2026-10' },
+      { id: 'cc_eastwest', name: 'EastWest Credit Card', category: 'credit_card', billerType: 'loan', aliases: ['EWB Credit Card', 'EastWest Card'], active: true, lastVerified: '2026-10' },
+      { id: 'cc_chinabank', name: 'Chinabank Credit Card', category: 'credit_card', billerType: 'loan', aliases: ['CBC Credit Card', 'Chinabank Destinations'], active: true, lastVerified: '2026-10' },
+      { id: 'cc_pnb', name: 'PNB Credit Card', category: 'credit_card', billerType: 'loan', aliases: ['PNB Cards', 'PNB Mabuhay Miles Card'], active: true, lastVerified: '2026-10' },
+      { id: 'cc_hsbc', name: 'HSBC Credit Card', category: 'credit_card', billerType: 'loan', aliases: ['HSBC Visa', 'HSBC Mastercard'], active: true, lastVerified: '2026-10' },
+      { id: 'cc_aub', name: 'AUB Credit Card', category: 'credit_card', billerType: 'loan', aliases: ['AUB Easy Mastercard'], active: true, lastVerified: '2026-10' },
+      { id: 'cc_mayacard', name: 'Maya Landers / Black Credit Card', category: 'credit_card', billerType: 'loan', aliases: ['Landers Cashback Everywhere', 'Maya Credit Card'], active: true, lastVerified: '2026-10' },
+      { id: 'cc_atome', name: 'Atome Card Philippines', category: 'credit_card', billerType: 'loan', aliases: ['Atome'], active: true, lastVerified: '2026-10' },
+
+      // =====================================================================
+      // E. ELECTRICITY PROVIDERS & COOPERATIVES (category: 'biller', billerType: 'electricity')
+      // =====================================================================
+      { id: 'bil_meralco', name: 'Meralco', category: 'biller', billerType: 'electricity', aliases: ['Manila Electric Company', 'MERALCO', 'Kuryente Load'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_veco', name: 'Visayan Electric Company (VECO)', category: 'biller', billerType: 'electricity', aliases: ['VECO', 'Visayan Electric', 'Cebu Electric'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_davaolight', name: 'Davao Light and Power Company', category: 'biller', billerType: 'electricity', aliases: ['Davao Light', 'DLPC'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_cotabatolight', name: 'Cotabato Light and Power Company', category: 'biller', billerType: 'electricity', aliases: ['Cotabato Light', 'CLPC'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_negrospower', name: 'Negros Power (NEPC / CENECO)', category: 'biller', billerType: 'electricity', aliases: ['CENECO', 'Central Negros Electric Cooperative', 'Negros Electric and Power Corp', 'Bacolod Electric'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_morepower', name: 'MORE Electric and Power Corp (MORE Power)', category: 'biller', billerType: 'electricity', aliases: ['MORE Power', 'Iloilo Electric', 'PECO'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_beneco', name: 'Benguet Electric Cooperative (BENECO)', category: 'biller', billerType: 'electricity', aliases: ['BENECO', 'Baguio Electric'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_batelec1', name: 'Batangas I Electric Cooperative (BATELEC I)', category: 'biller', billerType: 'electricity', aliases: ['BATELEC I', 'BATELEC 1'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_batelec2', name: 'Batangas II Electric Cooperative (BATELEC II)', category: 'biller', billerType: 'electricity', aliases: ['BATELEC II', 'BATELEC 2'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_cepalco', name: 'Cagayan Electric Power and Light (CEPALCO)', category: 'biller', billerType: 'electricity', aliases: ['CEPALCO', 'CDO Electric'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_boheco1', name: 'Bohol I Electric Cooperative (BOHECO I)', category: 'biller', billerType: 'electricity', aliases: ['BOHECO', 'BOHECO I', 'BOHECO 1'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_boheco2', name: 'Bohol II Electric Cooperative (BOHECO II)', category: 'biller', billerType: 'electricity', aliases: ['BOHECO II', 'BOHECO 2'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_meco', name: 'Mactan Electric Company (MECO)', category: 'biller', billerType: 'electricity', aliases: ['MECO', 'Lapu-Lapu Electric'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_cebeco', name: 'Cebu Electric Cooperative (CEBECO I / II / III)', category: 'biller', billerType: 'electricity', aliases: ['CEBECO', 'CEBECO 1', 'CEBECO 2', 'CEBECO 3'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_pelco', name: 'Pampanga Electric Cooperative (PELCO I / II / III)', category: 'biller', billerType: 'electricity', aliases: ['PELCO', 'PELCO 1', 'PELCO 2', 'PELCO 3'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_aec', name: 'Angeles Electric Corporation (AEC)', category: 'biller', billerType: 'electricity', aliases: ['AEC', 'Angeles Electric'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_sfelapco', name: 'San Fernando Electric Light & Power (SFELAPCO)', category: 'biller', billerType: 'electricity', aliases: ['SFELAPCO'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_penelco', name: 'Peninsula Electric Cooperative (PENELCO)', category: 'biller', billerType: 'electricity', aliases: ['PENELCO', 'Bataan Electric'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_subicenerzone', name: 'Subic EnerZone', category: 'biller', billerType: 'electricity', aliases: ['SEZ', 'Subic Electric'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_clarkelectric', name: 'Clark Electric Distribution Corp (CEDC)', category: 'biller', billerType: 'electricity', aliases: ['CEDC', 'Clark Electric'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_inec', name: 'Ilocos Norte Electric Cooperative (INEC)', category: 'biller', billerType: 'electricity', aliases: ['INEC'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_socoteco2', name: 'South Cotabato II Electric Cooperative (SOCOTECO II)', category: 'biller', billerType: 'electricity', aliases: ['SOCOTECO II', 'SOCOTECO 2', 'GenSan Electric'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_zamcelco', name: 'Zamboanga City Electric Cooperative (ZAMCELCO)', category: 'biller', billerType: 'electricity', aliases: ['ZAMCELCO'], active: true, lastVerified: '2026-10' },
+
+      // =====================================================================
+      // F. WATER UTILITIES & WATER DISTRICTS (category: 'biller', billerType: 'water')
+      // =====================================================================
+      { id: 'bil_manilawater', name: 'Manila Water', category: 'biller', billerType: 'water', aliases: ['MWCI', 'Manila Water Company'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_maynilad', name: 'Maynilad Water Services', category: 'biller', billerType: 'water', aliases: ['Maynilad'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_primewater', name: 'PrimeWater', category: 'biller', billerType: 'water', aliases: ['PrimeWater Infrastructure', 'BACIWA PrimeWater', 'Bacolod Water'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_mcwd', name: 'Metropolitan Cebu Water District (MCWD)', category: 'biller', billerType: 'water', aliases: ['MCWD', 'Cebu Water'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_dcwd', name: 'Davao City Water District (DCWD)', category: 'biller', billerType: 'water', aliases: ['DCWD', 'Davao Water'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_subicwater', name: 'Subic Water', category: 'biller', billerType: 'water', aliases: ['Subic Water and Sewerage'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_lagunawater', name: 'Laguna Water', category: 'biller', billerType: 'water', aliases: ['LAWC', 'Laguna AAAWater'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_clarkwater', name: 'Clark Water', category: 'biller', billerType: 'water', aliases: ['Clark Water Corporation'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_mpiw', name: 'Metro Pacific Iloilo Water (MPIW)', category: 'biller', billerType: 'water', aliases: ['MIWD', 'Metro Iloilo Water'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_bwd', name: 'Baguio Water District (BWD)', category: 'biller', billerType: 'water', aliases: ['BWD', 'Baguio Water'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_cowd', name: 'Cagayan de Oro Water District (COWD)', category: 'biller', billerType: 'water', aliases: ['COWD', 'CDO Water'], active: true, lastVerified: '2026-10' },
+
+      // =====================================================================
+      // G. TELECOMMUNICATIONS, INTERNET, & BROADBAND (category: 'biller', billerType: 'telecommunications')
+      // =====================================================================
+      { id: 'bil_pldt', name: 'PLDT', category: 'biller', billerType: 'telecommunications', aliases: ['PLDT Home', 'PLDT Fibr', 'PLDT Landline', 'PLDT Inc', 'PLDTHOME'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_globe', name: 'Globe Telecom', category: 'biller', billerType: 'telecommunications', aliases: ['Globe', 'Globe Postpaid', 'Globe Mobile'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_globeathome', name: 'Globe At Home', category: 'biller', billerType: 'telecommunications', aliases: ['GFiber', 'Globe Broadband', 'Globe Fiber'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_innove', name: 'Innove Communications', category: 'biller', billerType: 'telecommunications', aliases: ['Innove', 'Globe Innove'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_smart', name: 'Smart Communications', category: 'biller', billerType: 'telecommunications', aliases: ['Smart', 'Smart Postpaid', 'Smart Signature'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_smartbro', name: 'Smart Bro', category: 'biller', billerType: 'telecommunications', aliases: ['Smart Bro Home WiFi', 'Smart Broadband'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_converge', name: 'Converge ICT', category: 'biller', billerType: 'telecommunications', aliases: ['Converge', 'Converge ICT Solutions', 'FiberX', 'Surf2Sawa', 'Bida Fiber'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_dito', name: 'DITO Telecommunity', category: 'biller', billerType: 'telecommunications', aliases: ['DITO', 'DITO Home', 'DITO Postpaid'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_eastern', name: 'Eastern Communications', category: 'biller', billerType: 'telecommunications', aliases: ['Eastern Telecom', 'ETPI'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_skyfiber', name: 'Sky Fiber / Sky Broadband', category: 'biller', billerType: 'telecommunications', aliases: ['SkyBroadband', 'Sky Internet'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_redfiber', name: 'RED Fiber (Radius Telecoms)', category: 'biller', billerType: 'telecommunications', aliases: ['Radius Telecoms', 'Red Fiber'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_streamtech', name: 'Streamtech Fiber', category: 'biller', billerType: 'telecommunications', aliases: ['Streamtech', 'Planet Cable'], active: true, lastVerified: '2026-10' },
+
+      // =====================================================================
+      // H. CABLE TV & ENTERTAINMENT (category: 'biller', billerType: 'cable')
+      // =====================================================================
+      { id: 'bil_cignal', name: 'Cignal TV', category: 'biller', billerType: 'cable', aliases: ['Cignal', 'Cignal Postpaid', 'Cignal Prepaid', 'SatLite'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_skycable', name: 'Sky Cable', category: 'biller', billerType: 'cable', aliases: ['SkyCable', 'SKY'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_gsat', name: 'G Sat (Global Satellite)', category: 'biller', billerType: 'cable', aliases: ['GSat', 'G-Sat'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_cablelink', name: 'Cablelink', category: 'biller', billerType: 'cable', aliases: ['Cablelink TV'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_royalcable', name: 'Royal Cable', category: 'biller', billerType: 'cable', aliases: ['Royal Cablevision'], active: true, lastVerified: '2026-10' },
+
+      // =====================================================================
+      // I. GOVERNMENT AGENCIES & PUBLIC SERVICES (category: 'biller', billerType: 'government')
+      // =====================================================================
+      { id: 'bil_sss', name: 'SSS (Social Security System)', category: 'biller', billerType: 'government', aliases: ['SSS', 'Social Security System', 'SSS PRN', 'SS Number', 'CRN'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_pagibig', name: 'Pag-IBIG Fund (HDMF)', category: 'biller', billerType: 'government', aliases: ['Pag-IBIG', 'Pagibig', 'HDMF', 'Home Development Mutual Fund', 'MP2', 'MID', 'Pag-IBIG Housing Loan'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_philhealth', name: 'PhilHealth', category: 'biller', billerType: 'government', aliases: ['PHIC', 'Philippine Health Insurance Corporation', 'PhilHealth PIN'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_bir', name: 'BIR (Bureau of Internal Revenue)', category: 'biller', billerType: 'government', aliases: ['BIR', 'TIN', 'Tax Identification Number', 'Bureau of Internal Revenue'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_gsis', name: 'GSIS (Government Service Insurance System)', category: 'biller', billerType: 'government', aliases: ['GSIS', 'GSIS BP Number'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_nbi', name: 'NBI (National Bureau of Investigation)', category: 'biller', billerType: 'government', aliases: ['NBI', 'NBI Clearance'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_psa', name: 'PSA Serbilis / PSAHelpline', category: 'biller', billerType: 'government', aliases: ['PSA', 'Philippine Statistics Authority', 'NSO', 'National ID', 'PhilSys'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_lto', name: 'LTO (Land Transportation Office)', category: 'biller', billerType: 'government', aliases: ['LTO', 'LTMS', 'Drivers License', 'Motor Vehicle'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_dfa', name: 'DFA (Department of Foreign Affairs)', category: 'biller', billerType: 'government', aliases: ['DFA', 'DFA Passport', 'Passport Number'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_mmda', name: 'MMDA', category: 'biller', billerType: 'government', aliases: ['Metropolitan Manila Development Authority'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_tieza', name: 'TIEZA (Travel Tax)', category: 'biller', billerType: 'government', aliases: ['TIEZA', 'Tourism Infrastructure and Enterprise Zone Authority'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_owwa', name: 'OWWA / DMW', category: 'biller', billerType: 'government', aliases: ['OWWA', 'Overseas Workers Welfare Administration', 'POEA', 'DMW'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_prc', name: 'PRC (Professional Regulation Commission)', category: 'biller', billerType: 'government', aliases: ['PRC', 'LERIS', 'PRC License'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_nha', name: 'NHA (National Housing Authority)', category: 'biller', billerType: 'government', aliases: ['NHA'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_pnp', name: 'PNP (National Police Clearance)', category: 'biller', billerType: 'government', aliases: ['PNP', 'Police Clearance'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_sec', name: 'SEC (Securities and Exchange Commission)', category: 'biller', billerType: 'government', aliases: ['SEC', 'eSPARC'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_dti', name: 'DTI (Department of Trade and Industry)', category: 'biller', billerType: 'government', aliases: ['DTI', 'BNRS'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_lgurpt', name: 'LGU Real Property Tax (Amilyar) / Business Permit', category: 'biller', billerType: 'government', aliases: ['Amilyar', 'RPT', 'City Treasurer', 'LGU Tax'], active: true, lastVerified: '2026-10' },
+
+      // =====================================================================
+      // J. LOANS & FINANCING (category: 'biller', billerType: 'loan')
+      // =====================================================================
+      { id: 'bil_homecredit', name: 'Home Credit Philippines', category: 'biller', billerType: 'loan', aliases: ['Home Credit', 'HCPH'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_billease', name: 'BillEase', category: 'biller', billerType: 'loan', aliases: ['Billease', 'First Digital Finance'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_asialink', name: 'Asialink Finance Corporation', category: 'biller', billerType: 'loan', aliases: ['Asialink', 'AFC'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_globaldominion', name: 'Global Dominion Financing', category: 'biller', billerType: 'loan', aliases: ['Global Dominion', 'GDFI'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_aeon', name: 'AEON Credit Service Philippines', category: 'biller', billerType: 'loan', aliases: ['Aeon', 'Aeon Credit'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_toyotafinance', name: 'Toyota Financial Services PH', category: 'biller', billerType: 'loan', aliases: ['TFS', 'Toyota Finance'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_orix', name: 'Orix Metro Leasing and Finance', category: 'biller', billerType: 'loan', aliases: ['Orix Metro', 'Orix'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_tala', name: 'Tala Philippines', category: 'biller', billerType: 'loan', aliases: ['Tala Loan'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_ggives', name: 'GCash GLoan / GGives / GCredit', category: 'biller', billerType: 'loan', aliases: ['GLoan', 'GGives', 'GCredit', 'Fuse Lending'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_mayacredit', name: 'Maya Easy Credit / Personal Loan', category: 'biller', billerType: 'loan', aliases: ['Maya Credit', 'Maya Loan'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_spaylater', name: 'SPayLater / SLoan (SeaMoney)', category: 'biller', billerType: 'loan', aliases: ['SPayLater', 'SLoan', 'Shopee Loan'], active: true, lastVerified: '2026-10' },
+
+      // =====================================================================
+      // K. INSURANCE & HEALTHCARE / HMOs (category: 'biller', billerType: 'insurance')
+      // =====================================================================
+      { id: 'bil_sunlife', name: 'Sun Life Philippines', category: 'biller', billerType: 'insurance', aliases: ['SunLife', 'Sun Life of Canada', 'Sun Life Grepa'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_prulife', name: 'Pru Life UK', category: 'biller', billerType: 'insurance', aliases: ['PruLife', 'Prudential'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_aia', name: 'AIA Philippines', category: 'biller', billerType: 'insurance', aliases: ['Philam Life', 'BPI AIA', 'AIA'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_manulife', name: 'Manulife Philippines', category: 'biller', billerType: 'insurance', aliases: ['Manulife', 'Manulife China Bank'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_axa', name: 'AXA Philippines', category: 'biller', billerType: 'insurance', aliases: ['AXA', 'Metrobank AXA'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_fwd', name: 'FWD Life Insurance', category: 'biller', billerType: 'insurance', aliases: ['FWD', 'FWD PH'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_allianz', name: 'Allianz PNB Life', category: 'biller', billerType: 'insurance', aliases: ['Allianz'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_inlife', name: 'Insular Life (InLife)', category: 'biller', billerType: 'insurance', aliases: ['InLife', 'Insular Life'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_maxicare', name: 'Maxicare Healthcare Corp', category: 'biller', billerType: 'insurance', aliases: ['Maxicare', 'Maxicare HMO'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_medicard', name: 'MediCard Philippines', category: 'biller', billerType: 'insurance', aliases: ['Medicard', 'MediCard HMO'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_intellicare', name: 'Intellicare (Asalus Corp)', category: 'biller', billerType: 'insurance', aliases: ['Intellicare', 'Asalus'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_stpeter', name: 'St. Peter Life Plan', category: 'biller', billerType: 'insurance', aliases: ['St. Peter', 'St Peter Chapels'], active: true, lastVerified: '2026-10' },
+
+      // =====================================================================
+      // L. TOLLWAYS & RFID (category: 'biller', billerType: 'tollway')
+      // =====================================================================
+      { id: 'bil_autosweep', name: 'Autosweep RFID', category: 'biller', billerType: 'tollway', aliases: ['Autosweep', 'SMC Tollways', 'SLEX', 'Skyway', 'STAR Tollway', 'TPLEX', 'NAIAX'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_easytrip', name: 'Easytrip RFID', category: 'biller', billerType: 'tollway', aliases: ['Easytrip', 'MPTC', 'NLEX', 'SCTEX', 'CAVITEX', 'CALAX', 'CCLEX'], active: true, lastVerified: '2026-10' },
+
+      // =====================================================================
+      // M. EDUCATION, PROPERTY, HOSPITALS, & OTHER BILLERS
+      // =====================================================================
+      { id: 'bil_up', name: 'University of the Philippines (UP)', category: 'biller', billerType: 'education', aliases: ['UP', 'UP Diliman', 'UP Manila', 'UP Los Banos'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_ateneo', name: 'Ateneo de Manila University (ADMU)', category: 'biller', billerType: 'education', aliases: ['Ateneo', 'ADMU'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_dlsu', name: 'De La Salle University (DLSU / USLS / CSB)', category: 'biller', billerType: 'education', aliases: ['DLSU', 'La Salle', 'University of St. La Salle', 'USLS Bacolod', 'Benilde'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_ust', name: 'University of Santo Tomas (UST)', category: 'biller', billerType: 'education', aliases: ['UST'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_sti', name: 'STI College', category: 'biller', billerType: 'education', aliases: ['STI'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_ayalaland', name: 'Ayala Land / APMC (Avida, Alveo, Amaia)', category: 'biller', billerType: 'property', aliases: ['Ayala Land', 'APMC', 'Avida', 'Alveo', 'Amaia'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_smdc', name: 'SMDC / Greenmist Property Management', category: 'biller', billerType: 'property', aliases: ['SMDC', 'SM Development Corp', 'GPMC'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_dmci', name: 'DMCI Homes', category: 'biller', billerType: 'property', aliases: ['DMCI', 'DMCI Property Management'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_megaworld', name: 'Megaworld Corporation', category: 'biller', billerType: 'property', aliases: ['Megaworld', 'Empire East'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_vistaland', name: 'Vista Land / Camella Homes', category: 'biller', billerType: 'property', aliases: ['Camella', 'Vista Land', 'Crown Asia', 'Bria Homes'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_stlukes', name: "St. Luke's Medical Center (SLMC)", category: 'biller', billerType: 'healthcare', aliases: ['SLMC', 'St Lukes BGC', 'St Lukes QC'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_makatimed', name: 'Makati Medical Center (MMC)', category: 'biller', billerType: 'healthcare', aliases: ['Makati Med', 'MMC'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_medicalcity', name: 'The Medical City (TMC)', category: 'biller', billerType: 'healthcare', aliases: ['TMC', 'Medical City'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_riverside', name: 'Dr. Pablo O. Torre Memorial Hospital (Riverside Medical)', category: 'biller', billerType: 'healthcare', aliases: ['Riverside Medical Center', 'Bacolod Riverside'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_pal', name: 'Philippine Airlines (PAL / Mabuhay Miles)', category: 'biller', billerType: 'other', aliases: ['PAL', 'Mabuhay Miles'], active: true, lastVerified: '2026-10' },
+      { id: 'bil_cebupacific', name: 'Cebu Pacific (GoRewards)', category: 'biller', billerType: 'other', aliases: ['CEB', 'GoRewards', 'GetGo'], active: true, lastVerified: '2026-10' }
+    ];
+
+    /*************************************************************************
+     * 2. CATEGORY & BILLER METADATA DEFINITIONS
+     *************************************************************************/
+    const CATEGORY_META = {
+      bank: { label: 'Bank', badgeClass: 'bg-blue-50 text-blue-800 border-blue-200', defaultIdLabel: 'Account Number' },
+      digital_bank: { label: 'Digital Bank', badgeClass: 'bg-indigo-50 text-indigo-800 border-indigo-200', defaultIdLabel: 'Account Number' },
+      ewallet: { label: 'E-Wallet', badgeClass: 'bg-teal-50 text-teal-800 border-teal-200', defaultIdLabel: 'Mobile / Account Number' },
+      credit_card: { label: 'Credit Card', badgeClass: 'bg-amber-50 text-amber-900 border-amber-200', defaultIdLabel: 'Card / Customer Number' },
+      biller: { label: 'Biller', badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', defaultIdLabel: 'Account Number' },
+      other: { label: 'Other Record', badgeClass: 'bg-slate-100 text-slate-700 border-slate-300', defaultIdLabel: 'Reference / ID Number' }
+    };
+
+    const BILLER_TYPE_META = {
+      electricity: { label: 'Electricity', short: 'Electricity' },
+      water: { label: 'Water Utility', short: 'Water' },
+      telecommunications: { label: 'Telecom & Internet', short: 'Telecom / Internet' },
+      cable: { label: 'Cable & TV', short: 'Cable / TV' },
+      government: { label: 'Government Agency', short: 'Government' },
+      loan: { label: 'Loans & Financing', short: 'Loans / Financing' },
+      insurance: { label: 'Insurance & HMO', short: 'Insurance / HMO' },
+      tollway: { label: 'Tollways & RFID', short: 'Tollway / RFID' },
+      education: { label: 'Education & Schools', short: 'Education' },
+      property: { label: 'Property & Condo', short: 'Property / Real Estate' },
+      healthcare: { label: 'Hospitals & Medical', short: 'Healthcare' },
+      other: { label: 'Other Biller', short: 'Other Biller' }
+    };
+
+    const IDENTIFIER_LABELS = [
+      'Account Number',
+      'Customer Account Number',
+      'Subscriber Number',
+      'Contract Account Number',
+      'Member Number',
+      'MID / RTN Number',
+      'SS / CRN Number',
+      'PhilHealth PIN',
+      'TIN (Tax ID Number)',
+      'Policy Number',
+      'Card Number',
+      'Mobile Number',
+      'Loan Account Number',
+      'Reference Number',
+      'Meter / Service ID',
+      'Student / ID Number'
+    ];
+
+    /*************************************************************************
+     * 3. WEB CRYPTO API (AES-GCM 256-BIT + PBKDF2) & INDEXEDDB ENGINE
+     * Preserves encrypted vault architecture and supports backward migration.
+     *************************************************************************/
+    const DB_NAME = 'PesoVaultDB';
+    const DB_VERSION = 2;
+    const STORE_VAULT = 'vault_store';
+    const VAULT_META_KEY = 'pesovault_encrypted_payload';
+
+    const CryptoVault = {
+      db: null,
+
+      async openDB() {
+        if (this.db) return this.db;
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(DB_NAME, DB_VERSION);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_VAULT)) {
+              db.createObjectStore(STORE_VAULT);
+            }
+          };
+          req.onsuccess = (e) => {
+            this.db = e.target.result;
+            resolve(this.db);
+          };
+          req.onerror = () => reject(new Error('Failed to open IndexedDB storage.'));
+        });
+      },
+
+      async getStoredPayload() {
+        const db = await this.openDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_VAULT, 'readonly');
+          const store = tx.objectStore(STORE_VAULT);
+          const req = store.get(VAULT_META_KEY);
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => reject(new Error('Failed to read encrypted vault from IndexedDB.'));
+        });
+      },
+
+      async setStoredPayload(payload) {
+        const db = await this.openDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_VAULT, 'readwrite');
+          const store = tx.objectStore(STORE_VAULT);
+          const req = store.put(payload, VAULT_META_KEY);
+          req.onsuccess = () => resolve(true);
+          req.onerror = () => reject(new Error('Failed to write encrypted vault to IndexedDB.'));
+        });
+      },
+
+      async clearVaultStorage() {
+        const db = await this.openDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_VAULT, 'readwrite');
+          const store = tx.objectStore(STORE_VAULT);
+          const req = store.clear();
+          req.onsuccess = () => resolve(true);
+          req.onerror = () => reject(new Error('Failed to erase IndexedDB vault.'));
+        });
+      },
+
+      bufToBase64(buffer) {
+        const bytes = new Uint8Array(buffer);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary);
+      },
+
+      base64ToBuf(base64) {
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+        return bytes.buffer;
+      },
+
+      async deriveKey(passphrase, saltBytes, iterations = 120000) {
+        const enc = new TextEncoder();
+        const keyMaterial = await crypto.subtle.importKey(
+          'raw',
+          enc.encode(passphrase),
+          { name: 'PBKDF2' },
+          false,
+          ['deriveKey']
+        );
+        return crypto.subtle.deriveKey(
+          {
+            name: 'PBKDF2',
+            salt: saltBytes,
+            iterations,
+            hash: 'SHA-256'
+          },
+          keyMaterial,
+          { name: 'AES-GCM', length: 256 },
+          false,
+          ['encrypt', 'decrypt']
+        );
+      },
+
+      async encryptData(plainObj, cryptoKey, saltBase64, iterations = 120000) {
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const encoded = new TextEncoder().encode(JSON.stringify(plainObj));
+        const cipherBuf = await crypto.subtle.encrypt(
+          { name: 'AES-GCM', iv },
+          cryptoKey,
+          encoded
+        );
+        return {
+          version: 2,
+          kdf: 'PBKDF2-SHA256',
+          cipher: 'AES-GCM-256',
+          iterations,
+          salt: saltBase64,
+          iv: this.bufToBase64(iv),
+          ciphertext: this.bufToBase64(cipherBuf),
+          updatedAt: new Date().toISOString()
+        };
+      },
+
+      async decryptPayload(payload, passphrase) {
+        if (!payload || !payload.salt || !payload.iv || !payload.ciphertext) {
+          throw new Error('Malformed encrypted vault payload.');
+        }
+        const saltBuf = this.base64ToBuf(payload.salt);
+        const ivBuf = this.base64ToBuf(payload.iv);
+        const cipherBuf = this.base64ToBuf(payload.ciphertext);
+        const iterations = payload.iterations || 120000;
+        const key = await this.deriveKey(passphrase, new Uint8Array(saltBuf), iterations);
+        try {
+          const decryptedBuf = await crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: new Uint8Array(ivBuf) },
+            key,
+            cipherBuf
+          );
+          const jsonStr = new TextDecoder().decode(decryptedBuf);
+          const parsed = JSON.parse(jsonStr);
+          return { key, saltBase64: payload.salt, iterations, data: parsed };
+        } catch (err) {
+          throw new Error('Incorrect master passphrase or corrupted vault data.');
+        }
+      }
+    };
+
+    /*************************************************************************
+     * 4. WEB AUDIO CONFIRMATION SOUND GENERATOR (NO EXTERNAL AUDIO FILES)
+     *************************************************************************/
+    const SoundEngine = {
+      ctx: null,
+      playCopyChime(enabled = true) {
+        if (!enabled) return;
+        try {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return;
+          if (!this.ctx) this.ctx = new AudioCtx();
+          if (this.ctx.state === 'suspended') this.ctx.resume();
+
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(740, now); // F#5
+          osc.frequency.exponentialRampToValueAtTime(1108.73, now + 0.085); // C#6
+
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.exponentialRampToValueAtTime(0.11, now + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.17);
+        } catch (e) {
+          // Ignore audio context restriction errors silently
+        }
+      }
+    };
+
+    /*************************************************************************
+     * 5. STARTER RECORDS FOR NEW VAULTS (Demonstrating Banks, MariBank,
+     *    E-Wallets, PLDT, VECO, Meralco, SSS, Pag-IBIG with Leading Zeroes)
+     *************************************************************************/
+    function createStarterRecords() {
+      const now = new Date().toISOString();
+      return [
+        {
+          id: 'rec_starter_bdo',
+          category: 'bank',
+          billerType: null,
+          providerId: 'bank_bdo',
+          providerName: 'BDO Unibank',
+          nickname: 'BDO Payroll & Savings',
+          identifierLabel: 'Account Number',
+          identifierValue: '004589102348',
+          accountHolder: 'Juan Dela Cruz',
+          isFavorite: true,
+          notes: 'Primary BDO payroll and savings account (preserves leading zeroes).',
+          customFields: [{ label: 'Branch', value: 'Makati Main' }],
+          createdAt: now,
+          updatedAt: now
+        },
+        {
+          id: 'rec_starter_maribank',
+          category: 'digital_bank',
+          billerType: null,
+          providerId: 'dig_maribank',
+          providerName: 'MariBank',
+          nickname: 'MariBank High-Interest Savings',
+          identifierLabel: 'Account Number',
+          identifierValue: '10489203941',
+          accountHolder: 'Juan Dela Cruz',
+          isFavorite: true,
+          notes: 'Formerly SeaBank Philippines. Daily interest savings.',
+          customFields: [],
+          createdAt: now,
+          updatedAt: now
+        },
+        {
+          id: 'rec_starter_gcash',
+          category: 'ewallet',
+          billerType: null,
+          providerId: 'ew_gcash',
+          providerName: 'GCash',
+          nickname: 'Personal GCash',
+          identifierLabel: 'Mobile Number',
+          identifierValue: '09171234567',
+          accountHolder: 'Juan Dela Cruz',
+          isFavorite: true,
+          notes: 'Verified GCash wallet.',
+          customFields: [],
+          createdAt: now,
+          updatedAt: now
+        },
+        {
+          id: 'rec_starter_pldt',
+          category: 'biller',
+          billerType: 'telecommunications',
+          providerId: 'bil_pldt',
+          providerName: 'PLDT',
+          nickname: 'Home Fiber Internet',
+          identifierLabel: 'Account Number',
+          identifierValue: '0289104562',
+          accountHolder: 'Juan Dela Cruz',
+          isFavorite: true,
+          notes: 'PLDT Home Fiber 1699 plan.',
+          customFields: [{ label: 'Telephone No.', value: '0288123456' }],
+          createdAt: now,
+          updatedAt: now
+        },
+        {
+          id: 'rec_starter_veco',
+          category: 'biller',
+          billerType: 'electricity',
+          providerId: 'bil_veco',
+          providerName: 'Visayan Electric Company (VECO)',
+          nickname: 'Cebu Residence Electricity',
+          identifierLabel: 'Account Number',
+          identifierValue: '2004918273',
+          accountHolder: 'Juan Dela Cruz',
+          isFavorite: false,
+          notes: 'Monthly electric bill due every 20th.',
+          customFields: [],
+          createdAt: now,
+          updatedAt: now
+        },
+        {
+          id: 'rec_starter_meralco',
+          category: 'biller',
+          billerType: 'electricity',
+          providerId: 'bil_meralco',
+          providerName: 'Meralco',
+          nickname: 'Condo Unit 1208',
+          identifierLabel: 'Customer Account Number',
+          identifierValue: '109283746501',
+          accountHolder: 'Juan Dela Cruz',
+          isFavorite: false,
+          notes: '10-digit CAN for Meralco bills payment.',
+          customFields: [],
+          createdAt: now,
+          updatedAt: now
+        },
+        {
+          id: 'rec_starter_sss',
+          category: 'biller',
+          billerType: 'government',
+          providerId: 'bil_sss',
+          providerName: 'SSS (Social Security System)',
+          nickname: 'Personal SSS Number',
+          identifierLabel: 'SS / CRN Number',
+          identifierValue: '04-1928374-5',
+          accountHolder: 'Juan Dela Cruz',
+          isFavorite: true,
+          notes: 'Social Security System number for PRN contributions.',
+          customFields: [],
+          createdAt: now,
+          updatedAt: now
+        },
+        {
+          id: 'rec_starter_pagibig',
+          category: 'biller',
+          billerType: 'government',
+          providerId: 'bil_pagibig',
+          providerName: 'Pag-IBIG Fund (HDMF)',
+          nickname: 'Regular Savings & MP2',
+          identifierLabel: 'MID / RTN Number',
+          identifierValue: '1210-4928-3746',
+          accountHolder: 'Juan Dela Cruz',
+          isFavorite: false,
+          notes: 'Pag-IBIG Membership ID (MID).',
+          customFields: [{ label: 'MP2 Account No.', value: '509182736451' }],
+          createdAt: now,
+          updatedAt: now
+        }
+      ];
+    }
+
+    /*************************************************************************
+     * 6. HTML ESCAPING & STRING UTILITIES
+     *************************************************************************/
+    function escapeHTML(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function normalizeSearchToken(str) {
+      return String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function maskIdentifier(valStr) {
+      const s = String(valStr || '');
+      if (s.length <= 4) return '••••';
+      const visibleEnd = s.slice(-4);
+      const maskedPart = s.slice(0, -4).replace(/[a-zA-Z0-9]/g, '•');
+      return maskedPart + visibleEnd;
+    }
+
+    /*************************************************************************
+     * 7. MAIN PESOVAULT PH APPLICATION CONTROLLER
+     *************************************************************************/
+    const VaultApp = {
+      isUnlocked: false,
+      hasExistingVault: false,
+      cryptoKey: null,
+      saltBase64: null,
+      iterations: 120000,
+      autoLockTimer: null,
+      directoryIndexCache: null,
+
+      // Decrypted Vault State
+      vaultData: {
+        schemaVersion: 2,
+        settings: {
+          soundEnabled: true,
+          maskByDefault: true,
+          autoLockMinutes: 10
+        },
+        customDirectory: [],
+        records: []
+      },
+
+      // Active UI State
+      ui: {
+        globalMasked: true,
+        unmaskedRecordIds: new Set(),
+        searchQuery: '',
+        activeFilter: 'ALL',
+        favoritesOnly: false
+      },
+
+      async init() {
+        this.bindGlobalEvents();
+        await this.checkVaultStatus();
+      },
+
+      bindGlobalEvents() {
+        // Reset auto-lock timer on user interaction
+        ['click', 'keydown', 'mousemove', 'touchstart'].forEach(evName => {
+          document.addEventListener(evName, () => {
+            if (this.isUnlocked) this.resetAutoLockTimer();
+          }, { passive: true });
+        });
+
+        // Escape key closes active modal
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            const modal = document.getElementById('modalOverlay');
+            if (modal && !modal.classList.contains('hidden')) {
+              this.closeModal();
+            }
+          }
+        });
+
+        // Delegated Event Handler for Record List (Left Bubble Copy, Right Bubble Copy, Actions)
+        const listEl = document.getElementById('recordsListContainer');
+        if (listEl) {
+          listEl.addEventListener('click', (e) => {
+            const leftBubble = e.target.closest('[data-action="copy-provider"]');
+            if (leftBubble) {
+              const recId = leftBubble.getAttribute('data-record-id');
+              this.handleCopyBubble(recId, 'provider', leftBubble);
+              return;
+            }
+
+            const rightBubble = e.target.closest('[data-action="copy-identifier"]');
+            if (rightBubble) {
+              const recId = rightBubble.getAttribute('data-record-id');
+              this.handleCopyBubble(recId, 'identifier', rightBubble);
+              return;
+            }
+
+            const actionBtn = e.target.closest('[data-record-action]');
+            if (actionBtn) {
+              const action = actionBtn.getAttribute('data-record-action');
+              const recId = actionBtn.getAttribute('data-record-id');
+              if (action === 'toggle-fav') this.toggleRecordFavorite(recId);
+              if (action === 'toggle-mask') this.toggleSingleRecordMask(recId);
+              if (action === 'details') this.openRecordDetailsModal(recId);
+              if (action === 'edit') this.openRecordModal(recId);
+              if (action === 'delete') this.openDeleteRecordConfirmModal(recId);
+            }
+          });
+        }
+      },
+
+      async checkVaultStatus() {
+        try {
+          const payload = await CryptoVault.getStoredPayload();
+          this.hasExistingVault = Boolean(payload && payload.ciphertext);
+          const noticeEl = document.getElementById('authModeNotice');
+          const confirmBox = document.getElementById('authConfirmContainer');
+          const confirmInput = document.getElementById('authPassphraseConfirm');
+          const seedOpt = document.getElementById('authSeedStarterOption');
+          const btnText = document.getElementById('authSubmitBtnText');
+
+          if (this.hasExistingVault) {
+            noticeEl.innerHTML = `<strong class="text-emerald-400">Encrypted Vault Found.</strong> Enter your master passphrase to decrypt and unlock your saved Philippine bank and biller records.`;
+            confirmBox.classList.add('hidden');
+            confirmInput.required = false;
+            seedOpt.classList.add('hidden');
+            btnText.textContent = 'Unlock Encrypted Vault';
+          } else {
+            noticeEl.innerHTML = `<strong class="text-gold-400">First-Time Vault Setup.</strong> Create a master passphrase to initialize your AES-GCM 256-bit encrypted vault in this browser.`;
+            confirmBox.classList.remove('hidden');
+            confirmInput.required = true;
+            seedOpt.classList.remove('hidden');
+            btnText.textContent = 'Create & Unlock Vault';
+          }
+        } catch (err) {
+          this.showAuthError(err.message || 'Unable to access browser IndexedDB.');
+        }
+      },
+
+      showAuthError(msg) {
+        const box = document.getElementById('authErrorBox');
+        if (!box) return;
+        if (!msg) {
+          box.classList.add('hidden');
+          box.textContent = '';
+        } else {
+          box.textContent = msg;
+          box.classList.remove('hidden');
+        }
+      },
+
+      togglePassphraseVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        input.type = input.type === 'password' ? 'text' : 'password';
+      },
+
+      async handleAuthSubmit(e) {
+        e.preventDefault();
+        this.showAuthError('');
+        const passInput = document.getElementById('authPassphrase');
+        const confirmInput = document.getElementById('authPassphraseConfirm');
+        const passphrase = passInput ? passInput.value : '';
+
+        if (!passphrase || passphrase.length < 4) {
+          this.showAuthError('Please enter a master passphrase of at least 4 characters.');
+          return;
+        }
+
+        try {
+          if (this.hasExistingVault) {
+            const payload = await CryptoVault.getStoredPayload();
+            const res = await CryptoVault.decryptPayload(payload, passphrase);
+            this.cryptoKey = res.key;
+            this.saltBase64 = res.saltBase64;
+            this.iterations = res.iterations;
+            this.vaultData = this.migrateAndNormalizeVaultData(res.data);
+            await this.persistVault();
+          } else {
+            const confirmVal = confirmInput ? confirmInput.value : '';
+            if (passphrase !== confirmVal) {
+              this.showAuthError('Master passphrase and confirmation do not match.');
+              return;
+            }
+            const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+            this.saltBase64 = CryptoVault.bufToBase64(saltBytes);
+            this.iterations = 120000;
+            this.cryptoKey = await CryptoVault.deriveKey(passphrase, saltBytes, this.iterations);
+
+            const includeStarter = document.getElementById('authSeedSampleCheckbox')?.checked;
+            this.vaultData = {
+              schemaVersion: 2,
+              settings: {
+                soundEnabled: true,
+                maskByDefault: true,
+                autoLockMinutes: 10
+              },
+              customDirectory: [],
+              records: includeStarter ? createStarterRecords() : []
+            };
+            await this.persistVault();
+            this.hasExistingVault = true;
+          }
+
+          // Clear passphrase inputs immediately
+          if (passInput) passInput.value = '';
+          if (confirmInput) confirmInput.value = '';
+
+          this.isUnlocked = true;
+          this.ui.globalMasked = Boolean(this.vaultData.settings.maskByDefault);
+          this.ui.unmaskedRecordIds.clear();
+          this.invalidateDirectoryCache();
+
+          document.getElementById('vaultAuthScreen').classList.add('hidden');
+          document.getElementById('vaultMainApp').classList.remove('hidden');
+
+          this.resetAutoLockTimer();
+          this.renderAll();
+          this.toast('Vault unlocked securely.', 'success');
+        } catch (err) {
+          this.showAuthError(err.message || 'Failed to unlock vault.');
+        }
+      },
+
+      lockVault(message = 'Vault locked.') {
+        this.isUnlocked = false;
+        this.cryptoKey = null;
+        this.ui.unmaskedRecordIds.clear();
+        if (this.autoLockTimer) clearTimeout(this.autoLockTimer);
+        this.closeModal();
+
+        document.getElementById('vaultMainApp').classList.add('hidden');
+        document.getElementById('vaultAuthScreen').classList.remove('hidden');
+        this.checkVaultStatus();
+        if (message) this.toast(message, 'info');
+      },
+
+      resetAutoLockTimer() {
+        if (this.autoLockTimer) clearTimeout(this.autoLockTimer);
+        const mins = Number(this.vaultData?.settings?.autoLockMinutes || 0);
+        if (mins > 0 && this.isUnlocked) {
+          this.autoLockTimer = setTimeout(() => {
+            this.lockVault('Vault auto-locked due to inactivity.');
+          }, mins * 60 * 1000);
+        }
+      },
+
+      // Backward-Compatible Migration for Old Records & SeaBank -> MariBank
+      migrateAndNormalizeVaultData(raw) {
+        const safe = {
+          schemaVersion: 2,
+          settings: {
+            soundEnabled: raw?.settings?.soundEnabled !== undefined ? Boolean(raw.settings.soundEnabled) : true,
+            maskByDefault: raw?.settings?.maskByDefault !== undefined ? Boolean(raw.settings.maskByDefault) : true,
+            autoLockMinutes: Number(raw?.settings?.autoLockMinutes ?? 10)
+          },
+          customDirectory: Array.isArray(raw?.customDirectory) ? raw.customDirectory.map(d => this.normalizeDirectoryEntry(d, true)) : [],
+          records: []
+        };
+
+        const tempDir = [...BUILTIN_DIRECTORY, ...safe.customDirectory];
+        const rawRecords = Array.isArray(raw?.records) ? raw.records : [];
+
+        safe.records = rawRecords
+          .filter(r => r && typeof r === 'object')
+          .map(r => this.normalizeRecord(r, tempDir));
+
+        return safe;
+      },
+
+      normalizeDirectoryEntry(entry, isCustom = false) {
+        const category = ['bank', 'digital_bank', 'ewallet', 'credit_card', 'biller', 'other'].includes(entry.category)
+          ? entry.category
+          : 'biller';
+        const billerType = category === 'biller'
+          ? (BILLER_TYPE_META[entry.billerType] ? entry.billerType : 'other')
+          : (entry.billerType || null);
+
+        return {
+          id: String(entry.id || ('cust_dir_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6))),
+          name: String(entry.name || 'Unnamed Provider').trim(),
+          category,
+          billerType,
+          aliases: Array.isArray(entry.aliases)
+            ? entry.aliases.map(a => String(a).trim()).filter(Boolean)
+            : (typeof entry.aliases === 'string' ? entry.aliases.split(',').map(a => a.trim()).filter(Boolean) : []),
+          notes: String(entry.notes || '').trim(),
+          active: entry.active !== undefined ? Boolean(entry.active) : true,
+          isCustom: Boolean(isCustom || entry.isCustom),
+          lastVerified: entry.lastVerified || null
+        };
+      },
+
+      normalizeRecord(r, directoryList = null) {
+        const dir = directoryList || this.getAllDirectoryEntries();
+        let providerName = String(r.providerName || r.institution || r.billerName || r.provider || 'Unknown Provider').trim();
+        let providerId = r.providerId || null;
+
+        // Upgrade legacy SeaBank references to MariBank automatically while preserving ID mapping
+        if (providerName.toLowerCase() === 'seabank' || providerName.toLowerCase() === 'seabank philippines' || providerId === 'dig_seabank') {
+          providerId = 'dig_maribank';
+          providerName = 'MariBank';
+        }
+
+        // Try matching directory entry by ID or Name/Alias
+        let matchedDir = dir.find(d => d.id === providerId);
+        if (!matchedDir) {
+          const normName = normalizeSearchToken(providerName);
+          matchedDir = dir.find(d =>
+            normalizeSearchToken(d.name) === normName ||
+            (d.aliases || []).some(al => normalizeSearchToken(al) === normName)
+          );
+        }
+
+        if (matchedDir && !providerId) {
+          providerId = matchedDir.id;
+        }
+
+        // Infer category safely for older records without category metadata
+        let category = r.category;
+        if (!category || !CATEGORY_META[category]) {
+          if (matchedDir) {
+            category = matchedDir.category;
+          } else if (r.billerType) {
+            category = 'biller';
+          } else {
+            category = 'other';
+          }
+        }
+
+        let billerType = r.billerType || (matchedDir ? matchedDir.billerType : null);
+        if (category === 'biller' && (!billerType || !BILLER_TYPE_META[billerType])) {
+          billerType = 'other';
+        }
+
+        const defaultLabel = CATEGORY_META[category]?.defaultIdLabel || 'Account Number';
+        const identifierLabel = String(r.identifierLabel || r.label || defaultLabel).trim();
+        // CRITICAL: Always preserve identifierValue as an exact string (never convert to Number)
+        const identifierValue = String(r.identifierValue ?? r.accountNumber ?? r.number ?? '').trim();
+
+        const now = new Date().toISOString();
+        return {
+          id: String(r.id || ('rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7))),
+          category,
+          billerType,
+          providerId: providerId || null,
+          providerName: matchedDir ? matchedDir.name : providerName,
+          nickname: String(r.nickname || r.accountName || '').trim(),
+          identifierLabel,
+          identifierValue,
+          accountHolder: String(r.accountHolder || r.subscriberName || '').trim(),
+          isFavorite: Boolean(r.isFavorite || r.favorite),
+          notes: String(r.notes || '').trim(),
+          customFields: Array.isArray(r.customFields)
+            ? r.customFields.filter(cf => cf && cf.label).map(cf => ({ label: String(cf.label).trim(), value: String(cf.value ?? '').trim() }))
+            : [],
+          createdAt: r.createdAt || now,
+          updatedAt: r.updatedAt || now
+        };
+      },
+
+      async persistVault() {
+        if (!this.cryptoKey || !this.saltBase64) {
+          throw new Error('Vault is locked; cannot encrypt changes.');
+        }
+        const encryptedPayload = await CryptoVault.encryptData(
+          this.vaultData,
+          this.cryptoKey,
+          this.saltBase64,
+          this.iterations
+        );
+        await CryptoVault.setStoredPayload(encryptedPayload);
+        return true;
+      },
+
+      /***********************************************************************
+       * 8. DIRECTORY CACHE & LOOKUP ENGINE
+       ***********************************************************************/
+      invalidateDirectoryCache() {
+        this.directoryIndexCache = null;
+      },
+
+      getAllDirectoryEntries() {
+        if (this.directoryIndexCache) return this.directoryIndexCache;
+        const custom = Array.isArray(this.vaultData?.customDirectory) ? this.vaultData.customDirectory : [];
+        const combined = [...BUILTIN_DIRECTORY, ...custom].map(item => {
+          const searchTokens = [
+            item.name,
+            ...(item.aliases || []),
+            CATEGORY_META[item.category]?.label || '',
+            item.billerType ? (BILLER_TYPE_META[item.billerType]?.label || '') : ''
+          ].join(' ').toLowerCase();
+          return {
+            ...item,
+            _searchBlob: searchTokens,
+            _normBlob: normalizeSearchToken(searchTokens)
+          };
+        });
+        this.directoryIndexCache = combined;
+        return combined;
+      },
+
+      getDirectoryEntryByIdOrName(providerId, providerName) {
+        const all = this.getAllDirectoryEntries();
+        if (providerId) {
+          const byId = all.find(d => d.id === providerId);
+          if (byId) return byId;
+        }
+        if (providerName) {
+          const norm = normalizeSearchToken(providerName);
+          return all.find(d =>
+            normalizeSearchToken(d.name) === norm ||
+            (d.aliases || []).some(a => normalizeSearchToken(a) === norm)
+          ) || null;
+        }
+        return null;
+      },
+
+      /***********************************************************************
+       * 9. CLIPBOARD COPY & CONFIRMATION TONE HANDLER (Section 2 & 9)
+       ***********************************************************************/
+      async copyTextSafe(textToCopy) {
+        const str = String(textToCopy ?? '');
+        if (!str) return false;
+
+        // Try modern Clipboard API first, then fallback to textarea execCommand('copy')
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(str);
+            return true;
+          }
+        } catch (err) {
+          // Fallback below for iframe restrictions
+        }
+
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = str;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'fixed';
+          ta.style.top = '-9999px';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          ta.setSelectionRange(0, str.length);
+          const ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          return Boolean(ok);
+        } catch (err) {
+          return false;
+        }
+      },
+
+      async handleCopyBubble(recordId, side, bubbleEl) {
+        const rec = this.vaultData.records.find(r => r.id === recordId);
+        if (!rec) return;
+
+        // Left bubble copies exact Provider or Biller Name; Right bubble copies exact unmasked Identifier Value
+        const exactValue = side === 'provider' ? rec.providerName : rec.identifierValue;
+        const labelDesc = side === 'provider'
+          ? (rec.category === 'biller' ? 'Biller Name' : 'Provider Name')
+          : rec.identifierLabel;
+
+        const success = await this.copyTextSafe(exactValue);
+        if (success) {
+          SoundEngine.playCopyChime(this.vaultData.settings.soundEnabled);
+          if (bubbleEl) {
+            bubbleEl.classList.add('bubble-copied');
+            setTimeout(() => bubbleEl.classList.remove('bubble-copied'), 650);
+          }
+          const previewText = side === 'provider'
+            ? exactValue
+            : (this.isRecordMasked(rec.id) ? `${maskIdentifier(exactValue)} (Unmasked value copied)` : exactValue);
+          this.toast(`Copied ${labelDesc}: ${previewText}`, 'success');
+        } else {
+          this.toast(`Failed to copy ${labelDesc} to clipboard.`, 'error');
+        }
+      },
+
+      isRecordMasked(recordId) {
+        if (!this.ui.globalMasked) return false;
+        return !this.ui.unmaskedRecordIds.has(recordId);
+      },
+
+      toggleGlobalMasking() {
+        this.ui.globalMasked = !this.ui.globalMasked;
+        this.ui.unmaskedRecordIds.clear();
+        this.renderHeaderState();
+        this.renderRecords();
+      },
+
+      toggleSingleRecordMask(recordId) {
+        if (!this.ui.globalMasked) {
+          this.ui.globalMasked = true;
+          this.vaultData.records.forEach(r => {
+            if (r.id !== recordId) this.ui.unmaskedRecordIds.add(r.id);
+          });
+        } else {
+          if (this.ui.unmaskedRecordIds.has(recordId)) {
+            this.ui.unmaskedRecordIds.delete(recordId);
+          } else {
+            this.ui.unmaskedRecordIds.add(recordId);
+          }
+        }
+        this.renderHeaderState();
+        this.renderRecords();
+      },
+
+      async toggleRecordFavorite(recordId) {
+        const rec = this.vaultData.records.find(r => r.id === recordId);
+        if (!rec) return;
+        rec.isFavorite = !rec.isFavorite;
+        rec.updatedAt = new Date().toISOString();
+        try {
+          await this.persistVault();
+          this.renderStats();
+          this.renderRecords();
+          this.toast(rec.isFavorite ? `Added ${rec.providerName} to Favorites.` : `Removed ${rec.providerName} from Favorites.`, 'info');
+        } catch (err) {
+          this.toast('Failed to save favorite change.', 'error');
+        }
+      },
+
+      /***********************************************************************
+       * 10. FILTERING, SEARCHING, & RENDERING
+       ***********************************************************************/
+      handleSearchInput(val) {
+        this.ui.searchQuery = String(val || '');
+        const input = document.getElementById('recordSearchInput');
+        if (input && input.value !== this.ui.searchQuery) {
+          input.value = this.ui.searchQuery;
+        }
+        const clearBtn = document.getElementById('clearSearchBtn');
+        if (clearBtn) {
+          clearBtn.classList.toggle('hidden', !this.ui.searchQuery);
+        }
+        this.renderRecords();
+      },
+
+      setCategoryFilter(filterKey) {
+        this.ui.activeFilter = filterKey;
+        const selectEl = document.getElementById('categorySelectFilter');
+        if (selectEl && selectEl.value !== filterKey) {
+          selectEl.value = filterKey;
+        }
+        this.renderFilterPills();
+        this.renderRecords();
+      },
+
+      toggleFavoritesOnlyFilter() {
+        this.ui.favoritesOnly = !this.ui.favoritesOnly;
+        const btn = document.getElementById('favFilterToggleBtn');
+        if (btn) {
+          btn.setAttribute('aria-pressed', String(this.ui.favoritesOnly));
+          btn.className = this.ui.favoritesOnly
+            ? 'px-3.5 py-2.5 rounded-xl border border-gold-500 bg-amber-50 text-xs font-bold text-amber-900 flex items-center gap-1.5 transition shadow-sm'
+            : 'px-3.5 py-2.5 rounded-xl border border-ivory-300 bg-ivory-50 hover:bg-ivory-100 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition';
+        }
+        this.renderRecords();
+      },
+
+      getFilteredRecords() {
+        const q = this.ui.searchQuery.trim().toLowerCase();
+        const qNorm = normalizeSearchToken(q);
+        const filter = this.ui.activeFilter;
+        const favOnly = this.ui.favoritesOnly;
+
+        return this.vaultData.records.filter(rec => {
+          // 1. Favorites Combinable Filter
+          if (favOnly && !rec.isFavorite) return false;
+          if (filter === 'FAVORITES' && !rec.isFavorite) return false;
+
+          // 2. Category / Biller Type Filter
+          if (filter.startsWith('CAT_')) {
+            const targetCat = filter.replace('CAT_', '');
+            if (rec.category !== targetCat) return false;
+          } else if (filter.startsWith('BILLER_')) {
+            const targetBillerType = filter.replace('BILLER_', '');
+            if (rec.category !== 'biller' || rec.billerType !== targetBillerType) return false;
+          }
+
+          // 3. Instant Search across Provider, Biller Name, Aliases, Nickname, Identifier, Category, Biller Type, Holder, Notes
+          if (q) {
+            const dirEntry = this.getDirectoryEntryByIdOrName(rec.providerId, rec.providerName);
+            const aliasesStr = dirEntry && Array.isArray(dirEntry.aliases) ? dirEntry.aliases.join(' ') : '';
+            const catLabel = CATEGORY_META[rec.category]?.label || '';
+            const billerLabel = rec.billerType ? (BILLER_TYPE_META[rec.billerType]?.label || '') : '';
+            const customFieldsStr = (rec.customFields || []).map(cf => `${cf.label} ${cf.value}`).join(' ');
+
+            const haystack = [
+              rec.providerName,
+              aliasesStr,
+              rec.nickname,
+              rec.identifierLabel,
+              rec.identifierValue,
+              catLabel,
+              billerLabel,
+              rec.accountHolder,
+              rec.notes,
+              customFieldsStr
+            ].join(' ').toLowerCase();
+
+            const haystackNorm = normalizeSearchToken(haystack);
+            if (!haystack.includes(q) && (!qNorm || !haystackNorm.includes(qNorm))) {
+              return false;
+            }
+          }
+
+          return true;
+        });
+      },
+
+      renderAll() {
+        this.renderHeaderState();
+        this.renderStats();
+        this.renderFilterPills();
+        this.renderRecords();
+        const footerCount = document.getElementById('footerDirectoryCount');
+        if (footerCount) {
+          footerCount.textContent = String(this.getAllDirectoryEntries().filter(d => d.active !== false).length);
+        }
+      },
+
+      renderHeaderState() {
+        const label = document.getElementById('headerMaskLabel');
+        if (label) {
+          label.textContent = this.ui.globalMasked ? 'Masked' : 'Unmasked';
+        }
+      },
+
+      renderStats() {
+        const recs = this.vaultData.records;
+        const total = recs.length;
+        const favs = recs.filter(r => r.isFavorite).length;
+        const billers = recs.filter(r => r.category === 'biller').length;
+
+        // Unique providers counted by stable provider identity (or normalized providerName if custom/unlinked)
+        const uniqueSet = new Set();
+        recs.forEach(r => {
+          const key = r.providerId ? `id:${r.providerId}` : `name:${normalizeSearchToken(r.providerName)}`;
+          uniqueSet.add(key);
+        });
+
+        document.getElementById('statTotalRecords').textContent = String(total);
+        document.getElementById('statFavorites').textContent = String(favs);
+        document.getElementById('statUniqueProviders').textContent = String(uniqueSet.size);
+        document.getElementById('statBillerRecords').textContent = String(billers);
+      },
+
+      renderFilterPills() {
+        const bar = document.getElementById('filterPillsBar');
+        if (!bar) return;
+
+        const pills = [
+          { key: 'ALL', label: 'All Records' },
+          { key: 'FAVORITES', label: '★ Favorites' },
+          { key: 'CAT_bank', label: 'Banks' },
+          { key: 'CAT_digital_bank', label: 'Digital Banks' },
+          { key: 'CAT_ewallet', label: 'E-Wallets' },
+          { key: 'CAT_credit_card', label: 'Credit Cards' },
+          { key: 'CAT_biller', label: 'All Billers' },
+          { key: 'BILLER_electricity', label: 'Electricity' },
+          { key: 'BILLER_water', label: 'Water' },
+          { key: 'BILLER_telecommunications', label: 'Telecom & Internet' },
+          { key: 'BILLER_cable', label: 'Cable & TV' },
+          { key: 'BILLER_government', label: 'Government' },
+          { key: 'BILLER_loan', label: 'Loans & Financing' },
+          { key: 'BILLER_insurance', label: 'Insurance & Healthcare' },
+          { key: 'BILLER_tollway', label: 'Tollways & RFID' },
+          { key: 'BILLER_education', label: 'Education' },
+          { key: 'BILLER_property', label: 'Property' }
+        ];
+
+        bar.innerHTML = pills.map(p => {
+          const active = this.ui.activeFilter === p.key;
+          return `
+            <button
+              type="button"
+              onclick="VaultApp.setCategoryFilter('${p.key}')"
+              class="px-3 py-1.5 rounded-xl font-semibold whitespace-nowrap transition ${
+                active
+                  ? 'bg-navy-900 text-white shadow-sm'
+                  : 'bg-ivory-100 hover:bg-ivory-200 text-slate-700 border border-ivory-300'
+              }"
+            >
+              ${escapeHTML(p.label)}
+            </button>
+          `;
+        }).join('');
+      },
+
+      renderRecords() {
+        const container = document.getElementById('recordsListContainer');
+        const summaryEl = document.getElementById('recordsCountSummary');
+        if (!container) return;
+
+        const filtered = this.getFilteredRecords();
+        const totalCount = this.vaultData.records.length;
+
+        if (summaryEl) {
+          summaryEl.textContent = `Showing ${filtered.length} of ${totalCount} encrypted record${totalCount === 1 ? '' : 's'}`;
+        }
+
+        if (totalCount === 0) {
+          container.innerHTML = `
+            <div class="bg-white rounded-2xl border border-ivory-300 p-10 text-center space-y-3 shadow-sm">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center mx-auto">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+              </div>
+              <h3 class="text-base font-bold text-navy-900">Your PesoVault PH is Empty</h3>
+              <p class="text-xs text-slate-500 max-w-md mx-auto">Add your Philippine bank accounts, digital banks (MariBank, GoTyme, Maya), e-wallets (GCash), government IDs (SSS, Pag-IBIG), and utility billers (PLDT, VECO, Meralco) for instant tap-to-copy access.</p>
+              <button type="button" onclick="VaultApp.openRecordModal()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-sm transition">
+                + Add Your First Record
+              </button>
+            </div>
+          `;
+          return;
+        }
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="bg-white rounded-2xl border border-ivory-300 p-8 text-center space-y-3 shadow-sm">
+              <h3 class="text-sm font-bold text-navy-900">No Matching Records Found</h3>
+              <p class="text-xs text-slate-500">No saved records match your current search or category filter.</p>
+              <button type="button" onclick="VaultApp.handleSearchInput(''); VaultApp.setCategoryFilter('ALL'); if(VaultApp.ui.favoritesOnly) VaultApp.toggleFavoritesOnlyFilter();" class="px-3.5 py-2 rounded-xl bg-ivory-100 hover:bg-ivory-200 text-navy-900 text-xs font-semibold border border-ivory-300 transition">
+                Reset Search & Filters
+              </button>
+            </div>
+          `;
+          return;
+        }
+
+        // Sort favorites first, then alphabetically by providerName
+        const sorted = [...filtered].sort((a, b) => {
+          if (a.isFavorite !== b.isFavorite) return a.isFavorite ? -1 : 1;
+          return a.providerName.localeCompare(b.providerName);
+        });
+
+        container.innerHTML = sorted.map(rec => {
+          const catMeta = CATEGORY_META[rec.category] || CATEGORY_META.other;
+          const isBiller = rec.category === 'biller';
+          const billerSubLabel = isBiller && rec.billerType && BILLER_TYPE_META[rec.billerType]
+            ? `Biller • ${BILLER_TYPE_META[rec.billerType].short}`
+            : catMeta.label;
+
+          const masked = this.isRecordMasked(rec.id);
+          const displayedIdentifier = masked ? maskIdentifier(rec.identifierValue) : rec.identifierValue;
+
+          const dirEntry = this.getDirectoryEntryByIdOrName(rec.providerId, rec.providerName);
+          const isInactiveProvider = dirEntry && dirEntry.active === false;
+
+          return `
+            <article class="bg-white rounded-2xl border border-ivory-300 shadow-sm hover:shadow-md transition p-3.5 sm:p-4">
+              <!-- Card Top Metadata & Action Bar (Outside the Copy Bubbles) -->
+              <div class="flex items-center justify-between gap-2 mb-2.5 px-1">
+                <div class="flex items-center gap-2 flex-wrap min-w-0">
+                  <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${catMeta.badgeClass}">
+                    ${escapeHTML(billerSubLabel)}
+                  </span>
+                  ${rec.accountHolder ? `
+                    <span class="text-[11px] text-slate-500 truncate">Holder: <strong class="text-slate-700">${escapeHTML(rec.accountHolder)}</strong></span>
+                  ` : ''}
+                  ${isInactiveProvider ? `
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-medium">Archived Directory Provider</span>
+                  ` : ''}
+                </div>
+
+                <!-- Separate Action Icons (Never blocking the Left or Right Copy Bubbles) -->
+                <div class="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    data-record-action="toggle-fav"
+                    data-record-id="${escapeHTML(rec.id)}"
+                    class="p-1.5 rounded-lg hover:bg-ivory-100 ${rec.isFavorite ? 'text-gold-500' : 'text-slate-300 hover:text-slate-500'} transition"
+                    title="${rec.isFavorite ? 'Remove from Favorites' : 'Mark as Favorite'}"
+                    aria-label="Toggle Favorite for ${escapeHTML(rec.providerName)}"
+                  >
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  </button>
+
+                  <button
+                    type="button"
+                    data-record-action="toggle-mask"
+                    data-record-id="${escapeHTML(rec.id)}"
+                    class="p-1.5 rounded-lg hover:bg-ivory-100 text-slate-500 hover:text-navy-900 transition"
+                    title="${masked ? 'Reveal Identifier' : 'Mask Identifier'}"
+                    aria-label="Toggle Masking for ${escapeHTML(rec.providerName)}"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                  </button>
+
+                  <button
+                    type="button"
+                    data-record-action="details"
+                    data-record-id="${escapeHTML(rec.id)}"
+                    class="px-2 py-1 rounded-lg hover:bg-ivory-100 text-xs font-semibold text-navy-800 transition"
+                    title="View Full Record Details"
+                  >
+                    Details
+                  </button>
+
+                  <button
+                    type="button"
+                    data-record-action="edit"
+                    data-record-id="${escapeHTML(rec.id)}"
+                    class="p-1.5 rounded-lg hover:bg-ivory-100 text-slate-500 hover:text-navy-900 transition"
+                    title="Edit Record"
+                    aria-label="Edit ${escapeHTML(rec.providerName)}"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  </button>
+
+                  <button
+                    type="button"
+                    data-record-action="delete"
+                    data-record-id="${escapeHTML(rec.id)}"
+                    class="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition"
+                    title="Delete Record"
+                    aria-label="Delete ${escapeHTML(rec.providerName)}"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- NON-NEGOTIABLE TWO-BUBBLE LAYOUT: LEFT = PROVIDER/BILLER, RIGHT = IDENTIFIER -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <!-- LEFT BUBBLE: Entire bubble copies exact Provider or Biller Name -->
+                <button
+                  type="button"
+                  data-action="copy-provider"
+                  data-record-id="${escapeHTML(rec.id)}"
+                  class="copy-bubble w-full text-left p-4 rounded-xl bg-ivory-50 border border-ivory-300 flex flex-col justify-center min-h-[78px]"
+                  title="Tap to copy ${escapeHTML(rec.providerName)}"
+                >
+                  <span class="text-[11px] font-semibold uppercase tracking-wider text-emerald-700">
+                    ${isBiller ? 'Biller' : escapeHTML(catMeta.label)}
+                  </span>
+                  <span class="text-base sm:text-lg font-bold text-navy-900 leading-snug break-words mt-0.5">
+                    ${escapeHTML(rec.providerName)}
+                  </span>
+                  ${rec.nickname ? `
+                    <span class="text-xs font-medium text-slate-500 mt-0.5 break-words">
+                      ${escapeHTML(rec.nickname)}
+                    </span>
+                  ` : ''}
+                </button>
+
+                <!-- RIGHT BUBBLE: Entire bubble copies exact complete unmasked Identifier -->
+                <button
+                  type="button"
+                  data-action="copy-identifier"
+                  data-record-id="${escapeHTML(rec.id)}"
+                  class="copy-bubble w-full text-left p-4 rounded-xl bg-navy-900/5 border border-ivory-300 flex flex-col justify-center min-h-[78px]"
+                  title="Tap to copy unmasked ${escapeHTML(rec.identifierLabel)}"
+                >
+                  <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                    ${escapeHTML(rec.identifierLabel)}
+                  </span>
+                  <span class="text-base sm:text-xl font-bold font-mono text-navy-900 tracking-tight break-all mt-0.5">
+                    ${escapeHTML(displayedIdentifier)}
+                  </span>
+                  ${rec.notes ? `
+                    <span class="text-[11px] text-slate-500 truncate mt-0.5">
+                      ${escapeHTML(rec.notes)}
+                    </span>
+                  ` : ''}
+                </button>
+              </div>
+            </article>
+          `;
+        }).join('');
+      },
+
+      /***********************************************************************
+       * 11. MODAL SYSTEM: ADD/EDIT RECORD, DETAILS, DELETE, DIRECTORY, SETTINGS
+       ***********************************************************************/
+      openModal(title, bodyHTML, footerHTML) {
+        const overlay = document.getElementById('modalOverlay');
+        const titleEl = document.getElementById('modalHeaderTitle');
+        const bodyEl = document.getElementById('modalContentBody');
+        const footerEl = document.getElementById('modalContentFooter');
+
+        if (!overlay || !titleEl || !bodyEl || !footerEl) return;
+        titleEl.textContent = title;
+        bodyEl.innerHTML = bodyHTML;
+        footerEl.innerHTML = footerHTML || '';
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex');
+      },
+
+      closeModal() {
+        const overlay = document.getElementById('modalOverlay');
+        if (!overlay) return;
+        overlay.classList.add('hidden');
+        overlay.classList.remove('flex');
+      },
+
+      toast(message, type = 'success') {
+        const stack = document.getElementById('toastStack');
+        if (!stack) return;
+        const el = document.createElement('div');
+        const styleMap = {
+          success: 'bg-navy-900 border-emerald-500 text-white',
+          error: 'bg-rose-950 border-rose-500 text-white',
+          info: 'bg-navy-900 border-gold-500 text-white'
+        };
+        el.className = `pointer-events-auto border-l-4 ${styleMap[type] || styleMap.info} px-4 py-3 rounded-xl shadow-xl text-xs font-medium flex items-center justify-between gap-3`;
+        el.innerHTML = `
+          <span class="leading-relaxed break-words">${escapeHTML(message)}</span>
+          <button type="button" class="text-slate-400 hover:text-white shrink-0" onclick="this.parentElement.remove()">✕</button>
+        `;
+        stack.appendChild(el);
+        setTimeout(() => {
+          if (el.parentElement) el.remove();
+        }, 4000);
+      },
+
+      // =====================================================================
+      // ADD / EDIT RECORD MODAL (Section 6)
+      // =====================================================================
+      openRecordModal(recordId = null) {
+        const existing = recordId ? this.vaultData.records.find(r => r.id === recordId) : null;
+        const isEdit = Boolean(existing);
+
+        const initialCategory = existing ? existing.category : 'biller';
+        const initialBillerType = existing?.billerType || 'electricity';
+        const initialProviderId = existing?.providerId || '';
+        const initialProviderName = existing?.providerName || '';
+        const initialIdentifierLabel = existing?.identifierLabel || (CATEGORY_META[initialCategory]?.defaultIdLabel || 'Account Number');
+        const initialIdentifierValue = existing ? existing.identifierValue : '';
+        const initialNickname = existing?.nickname || '';
+        const initialHolder = existing?.accountHolder || '';
+        const initialFav = existing ? Boolean(existing.isFavorite) : false;
+        const initialNotes = existing?.notes || '';
+        const initialCustomFields = existing && Array.isArray(existing.customFields) ? existing.customFields : [];
+
+        const bodyHTML = `
+          <form id="recordModalForm" class="space-y-4" onsubmit="VaultApp.saveRecordFromModal(event, ${isEdit ? `'${escapeHTML(existing.id)}'` : 'null'})">
+            <div id="recordModalError" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-300 text-rose-800 text-xs font-medium"></div>
+
+            <!-- 1. Record Category & Biller Type -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="recFormCategory" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">1. Record Category *</label>
+                <select
+                  id="recFormCategory"
+                  onchange="VaultApp.handleRecordFormCategoryChange()"
+                  class="w-full px-3 py-2.5 rounded-xl border border-ivory-300 bg-ivory-50 text-sm font-semibold text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                >
+                  <option value="biller" ${initialCategory === 'biller' ? 'selected' : ''}>Biller (Utilities, Telco, Gov, Loans...)</option>
+                  <option value="bank" ${initialCategory === 'bank' ? 'selected' : ''}>Bank (Universal / Commercial / Thrift)</option>
+                  <option value="digital_bank" ${initialCategory === 'digital_bank' ? 'selected' : ''}>Digital Bank (MariBank, GoTyme, Maya...)</option>
+                  <option value="ewallet" ${initialCategory === 'ewallet' ? 'selected' : ''}>E-Wallet (GCash, Maya, GrabPay...)</option>
+                  <option value="credit_card" ${initialCategory === 'credit_card' ? 'selected' : ''}>Credit Card</option>
+                  <option value="other" ${initialCategory === 'other' ? 'selected' : ''}>Other Record</option>
+                </select>
+              </div>
+
+              <div id="recFormBillerTypeWrap" class="${initialCategory === 'biller' ? '' : 'hidden'}">
+                <label for="recFormBillerType" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Biller Subcategory Filter</label>
+                <select
+                  id="recFormBillerType"
+                  onchange="VaultApp.refreshProviderSelectorList()"
+                  class="w-full px-3 py-2.5 rounded-xl border border-ivory-300 bg-ivory-50 text-sm font-semibold text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                >
+                  <option value="ALL">All Biller Types</option>
+                  ${Object.entries(BILLER_TYPE_META).map(([k, v]) => `
+                    <option value="${k}" ${initialBillerType === k ? 'selected' : ''}>${escapeHTML(v.label)}</option>
+                  `).join('')}
+                </select>
+              </div>
+            </div>
+
+            <!-- 2 & 3. Searchable Provider / Biller Directory Selector -->
+            <div class="p-3.5 rounded-xl bg-ivory-50 border border-ivory-300 space-y-2.5">
+              <div class="flex items-center justify-between gap-2">
+                <label for="recFormDirectorySearch" class="text-xs font-bold uppercase tracking-wider text-navy-900">2. Select or Search Provider / Biller *</label>
+                <button type="button" onclick="VaultApp.toggleInlineQuickCustomBiller()" class="text-xs font-semibold text-emerald-700 hover:underline">
+                  + Not in list? Add Custom Provider
+                </button>
+              </div>
+
+              <input
+                type="search"
+                id="recFormDirectorySearch"
+                oninput="VaultApp.refreshProviderSelectorList()"
+                placeholder="Type to filter directory (e.g. PLDT, VECO, Meralco, MariBank, SeaBank, SSS, Pag-IBIG)..."
+                class="w-full px-3 py-2 rounded-lg border border-ivory-300 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              />
+
+              <div>
+                <select
+                  id="recFormProviderSelect"
+                  onchange="VaultApp.handleProviderSelectChange()"
+                  size="5"
+                  aria-label="Matching Directory Providers"
+                  class="w-full px-2.5 py-1.5 rounded-lg border border-ivory-300 bg-white text-xs sm:text-sm text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                ></select>
+              </div>
+
+              <!-- Selected Provider Display / Custom Override Input -->
+              <div class="pt-1">
+                <label for="recFormProviderName" class="block text-[11px] font-semibold text-slate-600 mb-1">
+                  Official Provider / Biller Name (Displayed in Left Bubble) *
+                </label>
+                <input
+                  type="text"
+                  id="recFormProviderName"
+                  required
+                  value="${escapeHTML(initialProviderName)}"
+                  placeholder="e.g. PLDT, Visayan Electric Company (VECO), BDO Unibank, MariBank"
+                  class="w-full px-3 py-2 rounded-lg border border-ivory-300 bg-white text-sm font-bold text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                />
+                <input type="hidden" id="recFormProviderId" value="${escapeHTML(initialProviderId)}" />
+              </div>
+
+              <!-- Inline Quick Add Custom Biller Box -->
+              <div id="inlineCustomBillerBox" class="hidden p-3 rounded-lg bg-emerald-50/70 border border-emerald-200 space-y-2">
+                <div class="text-xs font-bold text-emerald-950">Save as Reusable Custom Biller in Directory</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <input type="text" id="inlineCustomName" placeholder="Custom Biller Name *" class="px-2.5 py-1.5 rounded border border-emerald-300 bg-white text-xs" />
+                  <select id="inlineCustomBillerType" class="px-2.5 py-1.5 rounded border border-emerald-300 bg-white text-xs">
+                    ${Object.entries(BILLER_TYPE_META).map(([k, v]) => `<option value="${k}">${escapeHTML(v.label)}</option>`).join('')}
+                  </select>
+                </div>
+                <input type="text" id="inlineCustomAliases" placeholder="Optional search aliases (comma-separated)" class="w-full px-2.5 py-1.5 rounded border border-emerald-300 bg-white text-xs" />
+                <div class="flex justify-end gap-2">
+                  <button type="button" onclick="VaultApp.saveInlineCustomBiller()" class="px-3 py-1 rounded bg-emerald-700 text-white text-xs font-semibold hover:bg-emerald-800">
+                    Add to Directory & Select
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Account Nickname & 8. Account Holder -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="recFormNickname" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+                  Account Nickname / Description
+                </label>
+                <input
+                  type="text"
+                  id="recFormNickname"
+                  value="${escapeHTML(initialNickname)}"
+                  placeholder="e.g. Home Internet, Condo Unit 1208, Payroll"
+                  class="w-full px-3 py-2 rounded-xl border border-ivory-300 bg-ivory-50 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                />
+                <p class="text-[11px] text-slate-400 mt-0.5">Shown as a secondary label under the official name.</p>
+              </div>
+              <div>
+                <label for="recFormHolder" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+                  Account Holder / Subscriber Name
+                </label>
+                <input
+                  type="text"
+                  id="recFormHolder"
+                  value="${escapeHTML(initialHolder)}"
+                  placeholder="e.g. Juan Dela Cruz"
+                  class="w-full px-3 py-2 rounded-xl border border-ivory-300 bg-ivory-50 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                />
+              </div>
+            </div>
+
+            <!-- 5. Identifier Label & 6. Identifier Value (Right Bubble) -->
+            <div class="p-3.5 rounded-xl bg-navy-900/5 border border-ivory-300 space-y-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label for="recFormIdLabel" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    3. Identifier Label *
+                  </label>
+                  <input
+                    type="text"
+                    id="recFormIdLabel"
+                    list="identifierLabelsDatalist"
+                    required
+                    value="${escapeHTML(initialIdentifierLabel)}"
+                    placeholder="Account Number"
+                    class="w-full px-3 py-2 rounded-xl border border-ivory-300 bg-white text-sm font-semibold text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                  />
+                  <datalist id="identifierLabelsDatalist">
+                    ${IDENTIFIER_LABELS.map(l => `<option value="${escapeHTML(l)}"></option>`).join('')}
+                  </datalist>
+                </div>
+
+                <div>
+                  <label for="recFormIdValue" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    4. Identifier / Account Number *
+                  </label>
+                  <input
+                    type="text"
+                    id="recFormIdValue"
+                    required
+                    value="${escapeHTML(initialIdentifierValue)}"
+                    placeholder="e.g. 0012345678 or 04-1928374-5"
+                    class="w-full px-3 py-2 rounded-xl border border-ivory-300 bg-white text-sm font-mono font-bold text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                  />
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-500">Stored strictly as text so leading zeroes (such as <code class="font-mono font-bold">0012345678</code>), hyphens, and letters are preserved intact.</p>
+            </div>
+
+            <!-- 7. Favorite Checkbox & 9. Notes -->
+            <div class="space-y-3">
+              <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" id="recFormFavorite" ${initialFav ? 'checked' : ''} class="rounded border-ivory-300 text-emerald-600 focus:ring-emerald-500" />
+                <span class="text-xs font-semibold text-navy-900">Pin to Favorites (★)</span>
+              </label>
+
+              <div>
+                <label for="recFormNotes" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Optional Notes</label>
+                <textarea
+                  id="recFormNotes"
+                  rows="2"
+                  placeholder="Billing cycle, due date reminder, or reference instructions..."
+                  class="w-full px-3 py-2 rounded-xl border border-ivory-300 bg-ivory-50 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                >${escapeHTML(initialNotes)}</textarea>
+              </div>
+            </div>
+
+            <!-- 10. Optional Custom Fields -->
+            <div class="pt-2 border-t border-ivory-200 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-600">Optional Custom Fields</span>
+                <button type="button" onclick="VaultApp.addCustomFieldRow()" class="text-xs font-semibold text-emerald-700 hover:underline">
+                  + Add Custom Field
+                </button>
+              </div>
+              <div id="recFormCustomFieldsList" class="space-y-2">
+                ${initialCustomFields.map((cf) => this.renderCustomFieldRowHTML(cf.label, cf.value)).join('')}
+              </div>
+            </div>
+          </form>
+        `;
+
+        const footerHTML = `
+          <button type="button" onclick="VaultApp.closeModal()" class="px-4 py-2 rounded-xl border border-ivory-300 bg-white hover:bg-ivory-50 text-xs font-semibold text-slate-700">
+            Cancel
+          </button>
+          <button type="submit" form="recordModalForm" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-sm">
+            ${isEdit ? 'Save Changes' : 'Save Record'}
+          </button>
+        `;
+
+        this.openModal(isEdit ? `Edit Record — ${existing.providerName}` : 'Add Bank or Biller Record', bodyHTML, footerHTML);
+        this.refreshProviderSelectorList(initialProviderId, initialProviderName);
+      },
+
+      renderCustomFieldRowHTML(labelVal = '', valueVal = '') {
+        return `
+          <div class="custom-field-row flex items-center gap-2">
+            <input type="text" placeholder="Field Label (e.g. Meter No.)" value="${escapeHTML(labelVal)}" class="cf-label w-2/5 px-2.5 py-1.5 rounded-lg border border-ivory-300 text-xs" />
+            <input type="text" placeholder="Value" value="${escapeHTML(valueVal)}" class="cf-value flex-1 px-2.5 py-1.5 rounded-lg border border-ivory-300 text-xs font-mono" />
+            <button type="button" onclick="this.parentElement.remove()" class="p-1.5 text-slate-400 hover:text-rose-600" title="Remove field">✕</button>
+          </div>
+        `;
+      },
+
+      addCustomFieldRow() {
+        const container = document.getElementById('recFormCustomFieldsList');
+        if (!container) return;
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = this.renderCustomFieldRowHTML('', '');
+        container.appendChild(wrapper.firstElementChild);
+      },
+
+      handleRecordFormCategoryChange() {
+        const cat = document.getElementById('recFormCategory')?.value || 'biller';
+        const billerWrap = document.getElementById('recFormBillerTypeWrap');
+        const idLabelInput = document.getElementById('recFormIdLabel');
+
+        if (billerWrap) {
+          billerWrap.classList.toggle('hidden', cat !== 'biller');
+        }
+        if (idLabelInput) {
+          idLabelInput.value = CATEGORY_META[cat]?.defaultIdLabel || 'Account Number';
+        }
+        const billerTypeSel = document.getElementById('recFormBillerType');
+        if (billerTypeSel && cat === 'biller') {
+          billerTypeSel.value = 'ALL';
+        }
+        this.refreshProviderSelectorList();
+      },
+
+      refreshProviderSelectorList(preselectId = null, preselectName = null) {
+        const cat = document.getElementById('recFormCategory')?.value || 'biller';
+        const billerTypeFilter = document.getElementById('recFormBillerType')?.value || 'ALL';
+        const searchVal = (document.getElementById('recFormDirectorySearch')?.value || '').trim().toLowerCase();
+        const searchNorm = normalizeSearchToken(searchVal);
+        const selectEl = document.getElementById('recFormProviderSelect');
+        if (!selectEl) return;
+
+        const allEntries = this.getAllDirectoryEntries().filter(d => d.active !== false || d.id === preselectId);
+
+        const matching = allEntries.filter(d => {
+          // If user typed a search query, search across the selected category first, or all if needed
+          if (d.category !== cat && !(cat === 'biller' && d.category === 'credit_card')) {
+            return false;
+          }
+          if (cat === 'biller' && billerTypeFilter !== 'ALL' && d.billerType !== billerTypeFilter) {
+            return false;
+          }
+          if (searchVal) {
+            if (!d._searchBlob.includes(searchVal) && (!searchNorm || !d._normBlob.includes(searchNorm))) {
+              return false;
+            }
+          }
+          return true;
+        });
+
+        const currentId = preselectId !== null ? preselectId : (document.getElementById('recFormProviderId')?.value || '');
+
+        if (matching.length === 0) {
+          selectEl.innerHTML = `<option value="" disabled>No matching providers in this category — use search or type a custom name below</option>`;
+          return;
+        }
+
+        // Group billers by billerType for clarity when viewing billers
+        if (cat === 'biller' && billerTypeFilter === 'ALL') {
+          const groups = {};
+          matching.forEach(m => {
+            const gKey = m.billerType || 'other';
+            if (!groups[gKey]) groups[gKey] = [];
+            groups[gKey].push(m);
+          });
+          selectEl.innerHTML = Object.entries(groups).map(([gKey, items]) => {
+            const gLabel = BILLER_TYPE_META[gKey]?.label || 'Other Billers';
+            const opts = items.map(item => {
+              const aliasHint = item.aliases && item.aliases.length > 0 ? ` (${item.aliases.slice(0, 2).join(', ')})` : '';
+              return `<option value="${escapeHTML(item.id)}" ${item.id === currentId ? 'selected' : ''}>${escapeHTML(item.name)}${escapeHTML(aliasHint)}</option>`;
+            }).join('');
+            return `<optgroup label="${escapeHTML(gLabel)}">${opts}</optgroup>`;
+          }).join('');
+        } else {
+          selectEl.innerHTML = matching.map(item => {
+            const aliasHint = item.aliases && item.aliases.length > 0 ? ` (${item.aliases.slice(0, 2).join(', ')})` : '';
+            return `<option value="${escapeHTML(item.id)}" ${item.id === currentId ? 'selected' : ''}>${escapeHTML(item.name)}${escapeHTML(aliasHint)}</option>`;
+          }).join('');
+        }
+      },
+
+      handleProviderSelectChange() {
+        const selectEl = document.getElementById('recFormProviderSelect');
+        if (!selectEl || !selectEl.value) return;
+        const chosenId = selectEl.value;
+        const entry = this.getAllDirectoryEntries().find(d => d.id === chosenId);
+        if (!entry) return;
+
+        document.getElementById('recFormProviderId').value = entry.id;
+        document.getElementById('recFormProviderName').value = entry.name;
+
+        if (entry.category === 'biller' && entry.billerType) {
+          const btSelect = document.getElementById('recFormBillerType');
+          if (btSelect && btSelect.value === 'ALL') {
+            // Keep ALL so list doesn't jump, but store billerType on save
+          }
+        }
+      },
+
+      toggleInlineQuickCustomBiller() {
+        const box = document.getElementById('inlineCustomBillerBox');
+        if (box) box.classList.toggle('hidden');
+      },
+
+      async saveInlineCustomBiller() {
+        const nameInput = document.getElementById('inlineCustomName');
+        const typeSelect = document.getElementById('inlineCustomBillerType');
+        const aliasInput = document.getElementById('inlineCustomAliases');
+
+        const name = (nameInput?.value || '').trim();
+        if (!name) {
+          this.toast('Please enter a custom biller name.', 'error');
+          return;
+        }
+
+        const cat = document.getElementById('recFormCategory')?.value || 'biller';
+        const billerType = cat === 'biller' ? (typeSelect?.value || 'other') : null;
+        const aliases = (aliasInput?.value || '').split(',').map(a => a.trim()).filter(Boolean);
+
+        // Duplicate check
+        const existing = this.getDirectoryEntryByIdOrName(null, name);
+        if (existing) {
+          document.getElementById('recFormProviderId').value = existing.id;
+          document.getElementById('recFormProviderName').value = existing.name;
+          document.getElementById('inlineCustomBillerBox')?.classList.add('hidden');
+          this.refreshProviderSelectorList(existing.id, existing.name);
+          this.toast(`Selected existing directory provider: ${existing.name}`, 'info');
+          return;
+        }
+
+        const newEntry = this.normalizeDirectoryEntry({
+          id: 'cust_dir_' + Date.now(),
+          name,
+          category: cat === 'other' ? 'biller' : cat,
+          billerType: billerType || 'other',
+          aliases,
+          active: true,
+          isCustom: true
+        }, true);
+
+        this.vaultData.customDirectory.push(newEntry);
+        this.invalidateDirectoryCache();
+        await this.persistVault();
+
+        document.getElementById('recFormProviderId').value = newEntry.id;
+        document.getElementById('recFormProviderName').value = newEntry.name;
+        if (nameInput) nameInput.value = '';
+        if (aliasInput) aliasInput.value = '';
+        document.getElementById('inlineCustomBillerBox')?.classList.add('hidden');
+
+        this.refreshProviderSelectorList(newEntry.id, newEntry.name);
+        this.toast(`Added custom provider "${newEntry.name}" to directory.`, 'success');
+      },
+
+      async saveRecordFromModal(e, existingRecordId = null) {
+        e.preventDefault();
+        const errBox = document.getElementById('recordModalError');
+        const showErr = (msg) => {
+          if (errBox) {
+            errBox.textContent = msg;
+            errBox.classList.remove('hidden');
+          }
+        };
+
+        const category = document.getElementById('recFormCategory')?.value || 'biller';
+        const providerName = (document.getElementById('recFormProviderName')?.value || '').trim();
+        let providerId = (document.getElementById('recFormProviderId')?.value || '').trim();
+        const nickname = (document.getElementById('recFormNickname')?.value || '').trim();
+        const accountHolder = (document.getElementById('recFormHolder')?.value || '').trim();
+        const identifierLabel = (document.getElementById('recFormIdLabel')?.value || 'Account Number').trim();
+        // Keep identifierValue strictly as a string
+        const identifierValue = String(document.getElementById('recFormIdValue')?.value ?? '').trim();
+        const isFavorite = Boolean(document.getElementById('recFormFavorite')?.checked);
+        const notes = (document.getElementById('recFormNotes')?.value || '').trim();
+
+        if (!providerName) {
+          showErr('Please select or enter a Provider or Biller Name.');
+          return;
+        }
+        if (!identifierValue) {
+          showErr('Please enter the Account Number or Identifier Value.');
+          return;
+        }
+
+        // Verify if providerName matches the selected providerId or another directory item
+        let matchedEntry = this.getDirectoryEntryByIdOrName(providerId, providerName);
+        if (matchedEntry && normalizeSearchToken(matchedEntry.name) !== normalizeSearchToken(providerName)) {
+          // User manually edited the provider name to a custom one
+          matchedEntry = this.getDirectoryEntryByIdOrName(null, providerName);
+          providerId = matchedEntry ? matchedEntry.id : '';
+        } else if (matchedEntry) {
+          providerId = matchedEntry.id;
+        }
+
+        let billerType = null;
+        if (category === 'biller') {
+          const uiBillerType = document.getElementById('recFormBillerType')?.value;
+          if (matchedEntry && matchedEntry.billerType) {
+            billerType = matchedEntry.billerType;
+          } else if (uiBillerType && uiBillerType !== 'ALL') {
+            billerType = uiBillerType;
+          } else {
+            billerType = 'other';
+          }
+        }
+
+        const customFields = [];
+        document.querySelectorAll('#recFormCustomFieldsList .custom-field-row').forEach(row => {
+          const lbl = (row.querySelector('.cf-label')?.value || '').trim();
+          const val = String(row.querySelector('.cf-value')?.value ?? '').trim();
+          if (lbl) customFields.push({ label: lbl, value: val });
+        });
+
+        const now = new Date().toISOString();
+
+        if (existingRecordId) {
+          const idx = this.vaultData.records.findIndex(r => r.id === existingRecordId);
+          if (idx === -1) {
+            showErr('Record not found.');
+            return;
+          }
+          const old = this.vaultData.records[idx];
+          this.vaultData.records[idx] = {
+            ...old,
+            category,
+            billerType,
+            providerId: providerId || null,
+            providerName,
+            nickname,
+            identifierLabel: identifierLabel || 'Account Number',
+            identifierValue,
+            accountHolder,
+            isFavorite,
+            notes,
+            customFields,
+            updatedAt: now
+          };
+        } else {
+          // If user typed a brand-new custom biller name not in directory, also add it to customDirectory if category === 'biller'
+          if (!matchedEntry && category === 'biller') {
+            const autoCustom = this.normalizeDirectoryEntry({
+              id: 'cust_dir_' + Date.now(),
+              name: providerName,
+              category: 'biller',
+              billerType: billerType || 'other',
+              aliases: [],
+              active: true,
+              isCustom: true
+            }, true);
+            this.vaultData.customDirectory.push(autoCustom);
+            providerId = autoCustom.id;
+            this.invalidateDirectoryCache();
+          }
+
+          this.vaultData.records.unshift({
+            id: 'rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+            category,
+            billerType,
+            providerId: providerId || null,
+            providerName,
+            nickname,
+            identifierLabel: identifierLabel || 'Account Number',
+            identifierValue,
+            accountHolder,
+            isFavorite,
+            notes,
+            customFields,
+            createdAt: now,
+            updatedAt: now
+          });
+        }
+
+        try {
+          await this.persistVault();
+          this.closeModal();
+          this.renderAll();
+          this.toast(existingRecordId ? `Updated ${providerName}.` : `Added ${providerName} to vault.`, 'success');
+        } catch (err) {
+          showErr(err.message || 'Failed to encrypt and save record to IndexedDB.');
+        }
+      },
+
+      // =====================================================================
+      // RECORD DETAILS MODAL (Section 10 — Read & Tap-to-Copy)
+      // =====================================================================
+      openRecordDetailsModal(recordId) {
+        const rec = this.vaultData.records.find(r => r.id === recordId);
+        if (!rec) return;
+
+        const catMeta = CATEGORY_META[rec.category] || CATEGORY_META.other;
+        const billerSub = rec.category === 'biller' && rec.billerType && BILLER_TYPE_META[rec.billerType]
+          ? `${catMeta.label} • ${BILLER_TYPE_META[rec.billerType].label}`
+          : catMeta.label;
+
+        const bodyHTML = `
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${catMeta.badgeClass}">
+                ${escapeHTML(billerSub)}
+              </span>
+              <span class="text-xs text-slate-400">Updated ${new Date(rec.updatedAt).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+            </div>
+
+            <!-- Interactive Two-Bubble Copy Targets inside Details View -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                onclick="VaultApp.handleCopyBubble('${escapeHTML(rec.id)}', 'provider', this)"
+                class="copy-bubble text-left p-4 rounded-xl bg-ivory-50 border border-ivory-300"
+              >
+                <div class="text-[11px] font-bold uppercase tracking-wider text-emerald-700">Tap to Copy ${rec.category === 'biller' ? 'Biller' : 'Provider'}</div>
+                <div class="text-lg font-bold text-navy-900 mt-0.5 break-words">${escapeHTML(rec.providerName)}</div>
+                ${rec.nickname ? `<div class="text-xs text-slate-500 mt-0.5">${escapeHTML(rec.nickname)}</div>` : ''}
+              </button>
+
+              <button
+                type="button"
+                onclick="VaultApp.handleCopyBubble('${escapeHTML(rec.id)}', 'identifier', this)"
+                class="copy-bubble text-left p-4 rounded-xl bg-navy-900/5 border border-ivory-300"
+              >
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Tap to Copy ${escapeHTML(rec.identifierLabel)}</div>
+                <div class="text-lg font-bold font-mono text-navy-900 mt-0.5 break-all">${escapeHTML(rec.identifierValue)}</div>
+                <div class="text-[11px] text-emerald-700 mt-0.5 font-medium">Unmasked Exact Value</div>
+              </button>
+            </div>
+
+            <div class="bg-ivory-50 rounded-xl p-4 border border-ivory-200 space-y-2.5 text-xs">
+              <div class="flex justify-between py-1 border-b border-ivory-200">
+                <span class="text-slate-500">Account Nickname:</span>
+                <span class="font-semibold text-navy-900">${escapeHTML(rec.nickname || '—')}</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-ivory-200">
+                <span class="text-slate-500">Account Holder / Subscriber:</span>
+                <span class="font-semibold text-navy-900">${escapeHTML(rec.accountHolder || '—')}</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-ivory-200">
+                <span class="text-slate-500">Favorite Status:</span>
+                <span class="font-semibold text-navy-900">${rec.isFavorite ? '★ Favorited' : 'Standard'}</span>
+              </div>
+              ${rec.notes ? `
+                <div class="pt-1">
+                  <div class="text-slate-500 mb-1">Notes:</div>
+                  <div class="p-2.5 rounded-lg bg-white border border-ivory-200 text-slate-700 whitespace-pre-wrap">${escapeHTML(rec.notes)}</div>
+                </div>
+              ` : ''}
+              ${(rec.customFields && rec.customFields.length > 0) ? `
+                <div class="pt-2 space-y-1.5">
+                  <div class="text-slate-500 font-semibold">Custom Fields:</div>
+                  ${rec.customFields.map(cf => `
+                    <div class="flex items-center justify-between p-2 rounded-lg bg-white border border-ivory-200">
+                      <span class="text-slate-600 font-medium">${escapeHTML(cf.label)}</span>
+                      <span class="font-mono font-bold text-navy-900">${escapeHTML(cf.value)}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+
+        const footerHTML = `
+          <button type="button" onclick="VaultApp.openDeleteRecordConfirmModal('${escapeHTML(rec.id)}')" class="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold mr-auto">
+            Delete Record
+          </button>
+          <button type="button" onclick="VaultApp.closeModal()" class="px-4 py-2 rounded-xl border border-ivory-300 bg-white text-xs font-semibold text-slate-700">
+            Close
+          </button>
+          <button type="button" onclick="VaultApp.openRecordModal('${escapeHTML(rec.id)}')" class="px-4 py-2 rounded-xl bg-navy-900 hover:bg-navy-800 text-white text-xs font-semibold">
+            Edit Record
+          </button>
+        `;
+
+        this.openModal(`Record Details — ${rec.providerName}`, bodyHTML, footerHTML);
+      },
+
+      // =====================================================================
+      // DELETE SINGLE SAVED RECORD CONFIRMATION (Section 10)
+      // =====================================================================
+      openDeleteRecordConfirmModal(recordId) {
+        const rec = this.vaultData.records.find(r => r.id === recordId);
+        if (!rec) return;
+
+        const bodyHTML = `
+          <div class="space-y-3">
+            <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs leading-relaxed">
+              Are you sure you want to permanently delete this saved record from your encrypted vault? Other records sharing the same provider or biller will not be affected.
+            </div>
+            <div class="p-3.5 rounded-xl bg-ivory-50 border border-ivory-300 text-xs space-y-1">
+              <div><strong>Provider / Biller:</strong> ${escapeHTML(rec.providerName)}</div>
+              ${rec.nickname ? `<div><strong>Nickname:</strong> ${escapeHTML(rec.nickname)}</div>` : ''}
+              <div><strong>${escapeHTML(rec.identifierLabel)}:</strong> <span class="font-mono">${escapeHTML(rec.identifierValue)}</span></div>
+            </div>
+          </div>
+        `;
+
+        const footerHTML = `
+          <button type="button" onclick="VaultApp.closeModal()" class="px-4 py-2 rounded-xl border border-ivory-300 bg-white text-xs font-semibold text-slate-700">
+            Cancel
+          </button>
+          <button type="button" onclick="VaultApp.confirmDeleteRecord('${escapeHTML(rec.id)}')" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-sm">
+            Confirm Delete Record
+          </button>
+        `;
+
+        this.openModal('Delete Saved Record', bodyHTML, footerHTML);
+      },
+
+      async confirmDeleteRecord(recordId) {
+        const idx = this.vaultData.records.findIndex(r => r.id === recordId);
+        if (idx === -1) return;
+        const removed = this.vaultData.records[idx];
+        this.vaultData.records.splice(idx, 1);
+
+        try {
+          await this.persistVault();
+          this.closeModal();
+          this.renderAll();
+          this.toast(`Deleted record for ${removed.providerName}.`, 'info');
+        } catch (err) {
+          this.toast('Failed to save deletion to IndexedDB.', 'error');
+        }
+      },
+
+      // =====================================================================
+      // CUSTOM BILLER & DIRECTORY MANAGEMENT MODAL (Section 4, 5, 14)
+      // =====================================================================
+      openDirectoryModal(editCustomId = null) {
+        const customList = this.vaultData.customDirectory || [];
+        const editingEntry = editCustomId ? customList.find(c => c.id === editCustomId) : null;
+
+        const bodyHTML = `
+          <div class="space-y-5">
+            <div class="p-3.5 rounded-xl bg-ivory-100 border border-ivory-300 text-xs text-slate-600 leading-relaxed">
+              <strong class="text-navy-900">Philippine Bank & Biller Directory:</strong> The built-in directory includes <strong class="text-navy-900">${BUILTIN_DIRECTORY.length}</strong> verified Philippine banks, digital banks (including MariBank), e-wallets, government agencies, and utility billers. You can add, edit, import, or export custom billers below without affecting your encrypted account records.
+            </div>
+
+            <!-- Add or Edit Custom Biller Form -->
+            <form id="customBillerForm" onsubmit="VaultApp.saveCustomDirectoryEntry(event, ${editingEntry ? `'${escapeHTML(editingEntry.id)}'` : 'null'})" class="p-4 rounded-xl bg-white border border-ivory-300 space-y-3 shadow-sm">
+              <div class="text-xs font-bold uppercase tracking-wider text-navy-900">
+                ${editingEntry ? `Edit Custom Biller: ${escapeHTML(editingEntry.name)}` : 'Add Custom Biller / Provider'}
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Biller / Provider Name *</label>
+                  <input type="text" id="custDirName" required value="${escapeHTML(editingEntry?.name || '')}" placeholder="e.g. Silay Water District or Condo Corp" class="w-full px-3 py-2 rounded-lg border border-ivory-300 text-xs font-semibold" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Biller Type / Subcategory *</label>
+                  <select id="custDirBillerType" class="w-full px-3 py-2 rounded-lg border border-ivory-300 text-xs font-semibold">
+                    ${Object.entries(BILLER_TYPE_META).map(([k, v]) => `
+                      <option value="${k}" ${(editingEntry?.billerType || 'other') === k ? 'selected' : ''}>${escapeHTML(v.label)}</option>
+                    `).join('')}
+                  </select>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Optional Search Aliases (comma-separated)</label>
+                  <input type="text" id="custDirAliases" value="${escapeHTML((editingEntry?.aliases || []).join(', '))}" placeholder="e.g. SWD, Silay Water" class="w-full px-3 py-2 rounded-lg border border-ivory-300 text-xs" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Optional Notes</label>
+                  <input type="text" id="custDirNotes" value="${escapeHTML(editingEntry?.notes || '')}" placeholder="Optional directory note" class="w-full px-3 py-2 rounded-lg border border-ivory-300 text-xs" />
+                </div>
+              </div>
+              <div class="flex items-center justify-end gap-2">
+                ${editingEntry ? `
+                  <button type="button" onclick="VaultApp.openDirectoryModal()" class="px-3 py-1.5 rounded-lg border border-ivory-300 text-xs font-semibold text-slate-600">Cancel Edit</button>
+                ` : ''}
+                <button type="submit" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold">
+                  ${editingEntry ? 'Update Custom Biller' : '+ Save Custom Biller'}
+                </button>
+              </div>
+            </form>
+
+            <!-- Custom Billers List -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600">Saved Custom Billers (${customList.length})</h3>
+                <div class="flex items-center gap-2">
+                  <button type="button" onclick="VaultApp.exportCustomDirectoryJSON()" class="px-2.5 py-1 rounded-lg bg-ivory-100 hover:bg-ivory-200 border border-ivory-300 text-[11px] font-semibold text-navy-900">
+                    Export Custom Directory JSON
+                  </button>
+                  <label class="px-2.5 py-1 rounded-lg bg-ivory-100 hover:bg-ivory-200 border border-ivory-300 text-[11px] font-semibold text-navy-900 cursor-pointer">
+                    <span>Import Directory JSON</span>
+                    <input type="file" accept=".json,application/json" class="hidden" onchange="VaultApp.previewCustomDirectoryImport(event)" />
+                  </label>
+                </div>
+              </div>
+
+              <div id="customDirImportPreviewBox" class="hidden"></div>
+
+              ${customList.length === 0 ? `
+                <div class="p-4 rounded-xl bg-ivory-50 border border-ivory-200 text-xs text-slate-500 text-center">
+                  No custom billers added yet. Built-in billers (PLDT, VECO, Meralco, SSS, Pag-IBIG, etc.) are always available.
+                </div>
+              ` : `
+                <div class="divide-y divide-ivory-200 border border-ivory-300 rounded-xl bg-white max-h-56 overflow-y-auto">
+                  ${customList.map(c => {
+                    const usedCount = this.vaultData.records.filter(r => r.providerId === c.id || normalizeSearchToken(r.providerName) === normalizeSearchToken(c.name)).length;
+                    return `
+                      <div class="p-3 flex items-center justify-between gap-2 text-xs">
+                        <div>
+                          <div class="font-bold text-navy-900">${escapeHTML(c.name)}</div>
+                          <div class="text-[11px] text-slate-500">
+                            Biller • ${escapeHTML(BILLER_TYPE_META[c.billerType]?.short || 'Other')}
+                            ${c.aliases && c.aliases.length ? ` • Aliases: ${escapeHTML(c.aliases.join(', '))}` : ''}
+                            • Used by ${usedCount} record(s)
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                          <button type="button" onclick="VaultApp.openDirectoryModal('${escapeHTML(c.id)}')" class="px-2.5 py-1 rounded border border-ivory-300 hover:bg-ivory-100 font-semibold text-navy-900">Edit</button>
+                          <button type="button" onclick="VaultApp.removeCustomDirectoryEntry('${escapeHTML(c.id)}')" class="px-2.5 py-1 rounded border border-rose-200 bg-rose-50 hover:bg-rose-100 font-semibold text-rose-700">Remove</button>
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+
+        const footerHTML = `
+          <button type="button" onclick="VaultApp.closeModal()" class="px-4 py-2 rounded-xl bg-navy-900 text-white text-xs font-semibold">
+            Done
+          </button>
+        `;
+
+        this.openModal('Philippine Biller Directory & Custom Providers', bodyHTML, footerHTML);
+      },
+
+      async saveCustomDirectoryEntry(e, editId = null) {
+        e.preventDefault();
+        const name = (document.getElementById('custDirName')?.value || '').trim();
+        const billerType = document.getElementById('custDirBillerType')?.value || 'other';
+        const aliases = (document.getElementById('custDirAliases')?.value || '').split(',').map(a => a.trim()).filter(Boolean);
+        const notes = (document.getElementById('custDirNotes')?.value || '').trim();
+
+        if (!name) return;
+
+        // Check for duplicate in directory (excluding self when editing)
+        const normName = normalizeSearchToken(name);
+        const duplicate = this.getAllDirectoryEntries().find(d => d.id !== editId && normalizeSearchToken(d.name) === normName);
+        if (duplicate) {
+          this.toast(`Provider "${duplicate.name}" already exists in the directory.`, 'error');
+          return;
+        }
+
+        if (editId) {
+          const idx = this.vaultData.customDirectory.findIndex(c => c.id === editId);
+          if (idx !== -1) {
+            this.vaultData.customDirectory[idx] = {
+              ...this.vaultData.customDirectory[idx],
+              name,
+              category: 'biller',
+              billerType,
+              aliases,
+              notes
+            };
+            // Also keep linked records' display name updated
+            this.vaultData.records.forEach(r => {
+              if (r.providerId === editId) {
+                r.providerName = name;
+                r.billerType = billerType;
+              }
+            });
+          }
+        } else {
+          this.vaultData.customDirectory.push(this.normalizeDirectoryEntry({
+            id: 'cust_dir_' + Date.now(),
+            name,
+            category: 'biller',
+            billerType,
+            aliases,
+            notes,
+            active: true,
+            isCustom: true
+          }, true));
+        }
+
+        this.invalidateDirectoryCache();
+        await this.persistVault();
+        this.renderAll();
+        this.openDirectoryModal();
+        this.toast(editId ? `Updated custom biller "${name}".` : `Added custom biller "${name}".`, 'success');
+      },
+
+      async removeCustomDirectoryEntry(customId) {
+        const entry = this.vaultData.customDirectory.find(c => c.id === customId);
+        if (!entry) return;
+
+        const linkedRecords = this.vaultData.records.filter(
+          r => r.providerId === customId || normalizeSearchToken(r.providerName) === normalizeSearchToken(entry.name)
+        );
+
+        if (linkedRecords.length > 0) {
+          // Warn user before removing an entry referenced by saved records; preserve saved records!
+          const bodyHTML = `
+            <div class="space-y-3 text-xs">
+              <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-950 leading-relaxed">
+                <strong>Warning:</strong> Custom biller <strong>${escapeHTML(entry.name)}</strong> is currently referenced by <strong>${linkedRecords.length}</strong> saved account record(s).
+              </div>
+              <p class="text-slate-600">
+                Removing this entry from the active directory will <strong>not</strong> delete your saved account records—they will keep their provider name and account numbers intact.
+              </p>
+            </div>
+          `;
+          const footerHTML = `
+            <button type="button" onclick="VaultApp.openDirectoryModal()" class="px-4 py-2 rounded-xl border border-ivory-300 bg-white text-xs font-semibold text-slate-700">Cancel</button>
+            <button type="button" onclick="VaultApp.confirmRemoveCustomDirectoryEntry('${escapeHTML(customId)}')" class="px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-semibold">Remove from Directory Only</button>
+          `;
+          this.openModal('Confirm Custom Biller Removal', bodyHTML, footerHTML);
+          return;
+        }
+
+        await this.confirmRemoveCustomDirectoryEntry(customId);
+      },
+
+      async confirmRemoveCustomDirectoryEntry(customId) {
+        this.vaultData.customDirectory = this.vaultData.customDirectory.filter(c => c.id !== customId);
+        this.invalidateDirectoryCache();
+        await this.persistVault();
+        this.renderAll();
+        this.openDirectoryModal();
+        this.toast('Removed custom biller from directory. Saved account records were preserved.', 'info');
+      },
+
+      exportCustomDirectoryJSON() {
+        const payload = {
+          exportType: 'PesoVault_PH_Custom_Directory',
+          version: 2,
+          exportedAt: new Date().toISOString(),
+          customDirectory: this.vaultData.customDirectory || []
+        };
+        this.downloadJSONFile(payload, `PesoVault_Custom_Billers_${new Date().toISOString().slice(0, 10)}.json`);
+        this.toast('Exported custom biller directory JSON.', 'success');
+      },
+
+      previewCustomDirectoryImport(event) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const parsed = JSON.parse(String(e.target.result || ''));
+            const list = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.customDirectory) ? parsed.customDirectory : null);
+            if (!list) throw new Error('Invalid custom directory JSON format.');
+
+            const existingNorms = new Set(this.getAllDirectoryEntries().map(d => normalizeSearchToken(d.name)));
+            const toAdd = [];
+            const duplicates = [];
+
+            list.forEach(item => {
+              if (!item || !item.name) return;
+              const normalized = this.normalizeDirectoryEntry(item, true);
+              const norm = normalizeSearchToken(normalized.name);
+              if (existingNorms.has(norm)) {
+                duplicates.push(normalized.name);
+              } else {
+                existingNorms.add(norm);
+                toAdd.push(normalized);
+              }
+            });
+
+            this._pendingCustomDirImport = toAdd;
+            const previewBox = document.getElementById('customDirImportPreviewBox');
+            if (previewBox) {
+              previewBox.classList.remove('hidden');
+              previewBox.innerHTML = `
+                <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs space-y-2">
+                  <div class="font-bold text-emerald-950">Directory Import Preview</div>
+                  <div>New custom billers to add: <strong>${toAdd.length}</strong> | Duplicates skipped: <strong>${duplicates.length}</strong></div>
+                  ${toAdd.length > 0 ? `
+                    <div class="flex justify-end gap-2 pt-1">
+                      <button type="button" onclick="VaultApp.commitCustomDirectoryImport()" class="px-3 py-1.5 rounded-lg bg-emerald-700 text-white font-semibold">Confirm Import (${toAdd.length})</button>
+                    </div>
+                  ` : ''}
+                </div>
+              `;
+            }
+          } catch (err) {
+            this.toast(err.message || 'Malformed directory JSON file.', 'error');
+          }
+        };
+        reader.readAsText(file);
+      },
+
+      async commitCustomDirectoryImport() {
+        const toAdd = this._pendingCustomDirImport || [];
+        if (toAdd.length === 0) return;
+        this.vaultData.customDirectory.push(...toAdd);
+        this._pendingCustomDirImport = null;
+        this.invalidateDirectoryCache();
+        await this.persistVault();
+        this.renderAll();
+        this.openDirectoryModal();
+        this.toast(`Imported ${toAdd.length} custom biller(s).`, 'success');
+      },
+
+      // =====================================================================
+      // SETTINGS, ENCRYPTED BACKUP, RESTORE, & VAULT RESET MODAL (Section 12 & 14)
+      // =====================================================================
+      openSettingsModal() {
+        const s = this.vaultData.settings;
+
+        const bodyHTML = `
+          <div class="space-y-5">
+            <!-- Preferences -->
+            <div class="p-4 rounded-xl bg-ivory-50 border border-ivory-300 space-y-3">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-navy-900">Vault Preferences</h3>
+
+              <label class="flex items-center justify-between gap-3 cursor-pointer">
+                <div>
+                  <div class="text-xs font-semibold text-navy-900">Copy Confirmation Sound</div>
+                  <div class="text-[11px] text-slate-500">Play a subtle confirmation chime when tapping either copy bubble</div>
+                </div>
+                <input type="checkbox" id="setSoundEnabled" ${s.soundEnabled ? 'checked' : ''} onchange="VaultApp.updateSettingsFromModal()" class="w-4 h-4 rounded text-emerald-600" />
+              </label>
+
+              <label class="flex items-center justify-between gap-3 cursor-pointer pt-2 border-t border-ivory-200">
+                <div>
+                  <div class="text-xs font-semibold text-navy-900">Mask Values by Default</div>
+                  <div class="text-[11px] text-slate-500">Visually mask account numbers on unlock while still copying the full unmasked value</div>
+                </div>
+                <input type="checkbox" id="setMaskDefault" ${s.maskByDefault ? 'checked' : ''} onchange="VaultApp.updateSettingsFromModal()" class="w-4 h-4 rounded text-emerald-600" />
+              </label>
+
+              <div class="flex items-center justify-between gap-3 pt-2 border-t border-ivory-200">
+                <div>
+                  <div class="text-xs font-semibold text-navy-900">Auto-Lock Timeout</div>
+                  <div class="text-[11px] text-slate-500">Automatically lock encrypted vault after inactivity</div>
+                </div>
+                <select id="setAutoLock" onchange="VaultApp.updateSettingsFromModal()" class="px-2.5 py-1.5 rounded-lg border border-ivory-300 bg-white text-xs font-semibold">
+                  <option value="5" ${s.autoLockMinutes === 5 ? 'selected' : ''}>5 minutes</option>
+                  <option value="10" ${s.autoLockMinutes === 10 ? 'selected' : ''}>10 minutes</option>
+                  <option value="30" ${s.autoLockMinutes === 30 ? 'selected' : ''}>30 minutes</option>
+                  <option value="0" ${s.autoLockMinutes === 0 ? 'selected' : ''}>Never (Manual Lock)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Backup & Restore Personal Records -->
+            <div class="p-4 rounded-xl bg-white border border-ivory-300 space-y-3">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-navy-900">Backup & Restore Personal Records</h3>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                Export your vault as an AES-GCM encrypted backup (requires your master passphrase to restore) or a portable JSON backup (preserves leading zeroes on all account numbers).
+              </p>
+              <div class="flex flex-wrap items-center gap-2">
+                <button type="button" onclick="VaultApp.exportEncryptedVaultBackup()" class="px-3 py-2 rounded-xl bg-navy-900 hover:bg-navy-800 text-white text-xs font-semibold">
+                  Export Encrypted Vault (.json)
+                </button>
+                <button type="button" onclick="VaultApp.exportDecryptedRecordsBackup()" class="px-3 py-2 rounded-xl bg-ivory-100 hover:bg-ivory-200 border border-ivory-300 text-navy-900 text-xs font-semibold">
+                  Export Portable Records (.json)
+                </button>
+                <label class="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-900 text-xs font-semibold cursor-pointer">
+                  <span>Restore / Import Records (.json)</span>
+                  <input type="file" accept=".json,application/json" class="hidden" onchange="VaultApp.previewRecordsRestore(event)" />
+                </label>
+              </div>
+              <div id="recordsRestorePreviewBox" class="hidden"></div>
+            </div>
+
+            <!-- Danger Zone: Destroy Vault -->
+            <div class="p-4 rounded-xl bg-rose-50/70 border border-rose-200 space-y-2">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-rose-900">Danger Zone — Destroy Vault & Erase Data</h3>
+              <p class="text-xs text-rose-800">Permanently erase all encrypted records and master passphrase keys from this browser's IndexedDB.</p>
+              <button type="button" onclick="VaultApp.openDestroyVaultConfirm()" class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold">
+                Destroy Vault & Erase Data
+              </button>
+            </div>
+          </div>
+        `;
+
+        const footerHTML = `
+          <button type="button" onclick="VaultApp.closeModal()" class="px-4 py-2 rounded-xl bg-navy-900 text-white text-xs font-semibold">
+            Close
+          </button>
+        `;
+
+        this.openModal('Vault Settings & Backup', bodyHTML, footerHTML);
+      },
+
+      async updateSettingsFromModal() {
+        const soundEnabled = Boolean(document.getElementById('setSoundEnabled')?.checked);
+        const maskByDefault = Boolean(document.getElementById('setMaskDefault')?.checked);
+        const autoLockMinutes = Number(document.getElementById('setAutoLock')?.value ?? 10);
+
+        this.vaultData.settings = { soundEnabled, maskByDefault, autoLockMinutes };
+        this.resetAutoLockTimer();
+        await this.persistVault();
+        this.toast('Settings saved.', 'info');
+      },
+
+      async exportEncryptedVaultBackup() {
+        try {
+          const payload = await CryptoVault.getStoredPayload();
+          if (!payload) throw new Error('No encrypted payload found.');
+          const exportObj = {
+            backupType: 'PesoVault_PH_Encrypted_Vault',
+            exportedAt: new Date().toISOString(),
+            encryptedPayload: payload
+          };
+          this.downloadJSONFile(exportObj, `PesoVault_PH_Encrypted_${new Date().toISOString().slice(0, 10)}.json`);
+          this.toast('Downloaded AES-GCM encrypted vault backup.', 'success');
+        } catch (err) {
+          this.toast(err.message || 'Failed to export encrypted backup.', 'error');
+        }
+      },
+
+      exportDecryptedRecordsBackup() {
+        const exportObj = {
+          backupType: 'PesoVault_PH_Records_Backup',
+          schemaVersion: 2,
+          exportedAt: new Date().toISOString(),
+          settings: this.vaultData.settings,
+          customDirectory: this.vaultData.customDirectory,
+          records: this.vaultData.records
+        };
+        this.downloadJSONFile(exportObj, `PesoVault_PH_Records_${new Date().toISOString().slice(0, 10)}.json`);
+        this.toast('Downloaded portable JSON backup.', 'success');
+      },
+
+      previewRecordsRestore(event) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const previewBox = document.getElementById('recordsRestorePreviewBox');
+          try {
+            const rawText = String(e.target.result || '');
+            const parsed = JSON.parse(rawText);
+
+            // Case 1: Encrypted backup payload
+            if (parsed && parsed.encryptedPayload && parsed.encryptedPayload.ciphertext) {
+              this._pendingEncryptedRestore = parsed.encryptedPayload;
+              if (previewBox) {
+                previewBox.classList.remove('hidden');
+                previewBox.innerHTML = `
+                  <div class="p-3.5 rounded-xl bg-indigo-50 border border-indigo-300 text-xs space-y-2">
+                    <div class="font-bold text-indigo-950">Encrypted Vault Backup Detected</div>
+                    <p class="text-indigo-900">Enter the master passphrase for this backup to verify and restore its records:</p>
+                    <input type="password" id="restoreBackupPassphrase" placeholder="Backup Master Passphrase" class="w-full px-3 py-1.5 rounded border border-indigo-300 bg-white text-xs" />
+                    <div class="flex justify-end gap-2">
+                      <button type="button" onclick="VaultApp.commitEncryptedBackupRestore()" class="px-3 py-1.5 rounded-lg bg-indigo-700 text-white font-semibold">Decrypt & Merge Records</button>
+                    </div>
+                  </div>
+                `;
+              }
+              return;
+            }
+
+            // Case 2: Portable / Legacy JSON records array or vault object
+            const rawRecords = Array.isArray(parsed) ? parsed : (Array.isArray(parsed?.records) ? parsed.records : null);
+            if (!rawRecords) {
+              throw new Error('Invalid backup file: no valid records array found.');
+            }
+
+            const normalizedIncoming = rawRecords
+              .filter(r => r && typeof r === 'object' && (r.providerName || r.institution || r.billerName || r.identifierValue || r.accountNumber))
+              .map(r => this.normalizeRecord(r));
+
+            if (normalizedIncoming.length === 0 && rawRecords.length > 0) {
+              throw new Error('Backup records could not be validated.');
+            }
+
+            this._pendingPlainRestore = {
+              records: normalizedIncoming,
+              customDirectory: Array.isArray(parsed?.customDirectory) ? parsed.customDirectory.map(d => this.normalizeDirectoryEntry(d, true)) : []
+            };
+
+            if (previewBox) {
+              previewBox.classList.remove('hidden');
+              previewBox.innerHTML = `
+                <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs space-y-2">
+                  <div class="font-bold text-emerald-950">Backup Validated: ${normalizedIncoming.length} Record(s) Ready</div>
+                  <p class="text-emerald-900">All identifiers are preserved as exact strings (including leading zeroes). Choose how to apply:</p>
+                  <div class="flex flex-wrap justify-end gap-2 pt-1">
+                    <button type="button" onclick="VaultApp.commitPlainRestore('merge')" class="px-3 py-1.5 rounded-lg bg-emerald-700 text-white font-semibold">Merge with Existing Vault</button>
+                    <button type="button" onclick="VaultApp.commitPlainRestore('replace')" class="px-3 py-1.5 rounded-lg bg-amber-700 text-white font-semibold">Replace Existing Records</button>
+                  </div>
+                </div>
+              `;
+            }
+          } catch (err) {
+            if (previewBox) {
+              previewBox.classList.remove('hidden');
+              previewBox.innerHTML = `<div class="p-3 rounded-xl bg-rose-50 border border-rose-300 text-rose-800 text-xs font-semibold">${escapeHTML(err.message || 'Invalid JSON backup file.')}</div>`;
+            }
+            this.toast(err.message || 'Invalid JSON backup file.', 'error');
+          }
+        };
+        reader.readAsText(file);
+      },
+
+      async commitEncryptedBackupRestore() {
+        const pass = document.getElementById('restoreBackupPassphrase')?.value || '';
+        if (!pass || !this._pendingEncryptedRestore) return;
+        try {
+          const decrypted = await CryptoVault.decryptPayload(this._pendingEncryptedRestore, pass);
+          const migrated = this.migrateAndNormalizeVaultData(decrypted.data);
+          this._pendingPlainRestore = {
+            records: migrated.records,
+            customDirectory: migrated.customDirectory
+          };
+          await this.commitPlainRestore('merge');
+        } catch (err) {
+          this.toast(err.message || 'Incorrect passphrase for backup file.', 'error');
+        }
+      },
+
+      async commitPlainRestore(mode = 'merge') {
+        const pending = this._pendingPlainRestore;
+        if (!pending) return;
+
+        // Merge custom directory without duplicates
+        const existingDirNorms = new Set(this.getAllDirectoryEntries().map(d => normalizeSearchToken(d.name)));
+        (pending.customDirectory || []).forEach(cd => {
+          const norm = normalizeSearchToken(cd.name);
+          if (!existingDirNorms.has(norm)) {
+            existingDirNorms.add(norm);
+            this.vaultData.customDirectory.push(cd);
+          }
+        });
+
+        if (mode === 'replace') {
+          this.vaultData.records = pending.records;
+        } else {
+          // Merge by ID or unique (providerName + identifierValue)
+          const existingIds = new Set(this.vaultData.records.map(r => r.id));
+          pending.records.forEach(inc => {
+            if (existingIds.has(inc.id)) {
+              const idx = this.vaultData.records.findIndex(r => r.id === inc.id);
+              this.vaultData.records[idx] = inc;
+            } else {
+              this.vaultData.records.push(inc);
+            }
+          });
+        }
+
+        this._pendingPlainRestore = null;
+        this._pendingEncryptedRestore = null;
+        this.invalidateDirectoryCache();
+        await this.persistVault();
+        this.closeModal();
+        this.renderAll();
+        this.toast(`Restored records (${mode === 'replace' ? 'replaced' : 'merged'}) successfully.`, 'success');
+      },
+
+      openDestroyVaultConfirm() {
+        const bodyHTML = `
+          <div class="space-y-3 text-xs">
+            <div class="p-4 rounded-xl bg-rose-50 border border-rose-300 text-rose-900 font-medium leading-relaxed">
+              This will permanently destroy your encrypted vault and erase all saved bank and biller records from this browser. This action cannot be undone unless you have exported a backup.
+            </div>
+          </div>
+        `;
+        const footerHTML = `
+          <button type="button" onclick="VaultApp.openSettingsModal()" class="px-4 py-2 rounded-xl border border-ivory-300 bg-white text-xs font-semibold text-slate-700">Cancel</button>
+          <button type="button" onclick="VaultApp.executeDestroyVault()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold">Yes, Destroy Vault</button>
+        `;
+        this.openModal('Confirm Destroy Vault', bodyHTML, footerHTML);
+      },
+
+      openResetVaultConfirmFromLock() {
+        const bodyHTML = `
+          <div class="space-y-3 text-xs">
+            <div class="p-4 rounded-xl bg-rose-50 border border-rose-300 text-rose-900 font-medium leading-relaxed">
+              Forgot your master passphrase? Because PesoVault PH uses zero-knowledge AES-GCM encryption, your data cannot be decrypted without the passphrase. You can erase the existing vault to start fresh.
+            </div>
+          </div>
+        `;
+        const footerHTML = `
+          <button type="button" onclick="VaultApp.closeModal()" class="px-4 py-2 rounded-xl border border-ivory-300 bg-white text-xs font-semibold text-slate-700">Cancel</button>
+          <button type="button" onclick="VaultApp.executeDestroyVault()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold">Erase Vault & Start Fresh</button>
+        `;
+        this.openModal('Erase Encrypted Vault', bodyHTML, footerHTML);
+      },
+
+      async executeDestroyVault() {
+        await CryptoVault.clearVaultStorage();
+        this.hasExistingVault = false;
+        this.lockVault('Vault erased. You can now initialize a new vault.');
+      },
+
+      downloadJSONFile(obj, filename) {
+        const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      },
+
+      downloadStandaloneHTML() {
+        const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'PesoVault_PH.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        this.toast('Downloaded standalone PesoVault_PH.html file.', 'success');
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      VaultApp.init();
+    });
+  </script>
+</body>
+</html>
