@@ -2594,6 +2594,58 @@
         this.toast('Exported saved records to JSON.', 'success');
       },
 
+      base64ToBuf(base64) {
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+        return bytes.buffer;
+      },
+
+      async decryptLegacyBackupPayload(payload, passphrase) {
+        if (!payload || !payload.salt || !payload.iv || !payload.ciphertext) {
+          throw new Error('Malformed encrypted backup payload.');
+        }
+        const saltBuf = this.base64ToBuf(payload.salt);
+        const ivBuf = this.base64ToBuf(payload.iv);
+        const cipherBuf = this.base64ToBuf(payload.ciphertext);
+        const iterations = payload.iterations || 120000;
+
+        const enc = new TextEncoder();
+        const keyMaterial = await crypto.subtle.importKey(
+          'raw',
+          enc.encode(passphrase),
+          { name: 'PBKDF2' },
+          false,
+          ['deriveKey']
+        );
+        const key = await crypto.subtle.deriveKey(
+          {
+            name: 'PBKDF2',
+            salt: new Uint8Array(saltBuf),
+            iterations,
+            hash: 'SHA-256'
+          },
+          keyMaterial,
+          { name: 'AES-GCM', length: 256 },
+          false,
+          ['decrypt']
+        );
+
+        try {
+          const decryptedBuf = await crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: new Uint8Array(ivBuf) },
+            key,
+            cipherBuf
+          );
+          const jsonStr = new TextDecoder().decode(decryptedBuf);
+          return JSON.parse(jsonStr);
+        } catch (err) {
+          throw new Error('Incorrect passphrase for this encrypted backup file.');
+        }
+      },
+
       previewRecordsRestore(event) {
         const file = event.target.files?.[0];
         if (!file) return;
@@ -2605,7 +2657,35 @@
             const parsed = JSON.parse(rawText);
 
             if (parsed && parsed.encryptedPayload && parsed.encryptedPayload.ciphertext) {
-              throw new Error('This file is an encrypted payload from an older version and cannot be imported without a portable JSON records backup.');
+              this._pendingEncryptedBackupPayload = parsed.encryptedPayload;
+              if (previewBox) {
+                previewBox.classList.remove('hidden');
+                previewBox.innerHTML = `
+                  <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-xs space-y-2.5">
+                    <div class="font-bold text-amber-950">Legacy Encrypted Backup File Detected</div>
+                    <p class="text-amber-900 leading-relaxed">
+                      This file (<code class="font-mono">PesoVault_PH_Encrypted_Vault</code>) was exported with AES-GCM encryption. Enter the passphrase used when this file was created to decrypt and convert it into the new password-free format:
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                      <input
+                        type="password"
+                        id="legacyBackupPassphraseInput"
+                        placeholder="Enter passphrase for this backup file..."
+                        class="flex-1 px-3 py-2 rounded-lg border border-amber-300 bg-white text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                        onkeydown="if(event.key==='Enter'){event.preventDefault();VaultApp.unlockAndPreviewLegacyBackup();}"
+                      />
+                      <button
+                        type="button"
+                        onclick="VaultApp.unlockAndPreviewLegacyBackup()"
+                        class="px-3.5 py-2 rounded-lg bg-navy-900 hover:bg-navy-800 text-white font-semibold text-xs shrink-0"
+                      >
+                        Decrypt &amp; Convert File
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }
+              return;
             }
 
             const rawRecords = Array.isArray(parsed) ? parsed : (Array.isArray(parsed?.records) ? parsed.records : null);
@@ -2648,6 +2728,67 @@
           }
         };
         reader.readAsText(file);
+      },
+
+      async unlockAndPreviewLegacyBackup() {
+        const passInput = document.getElementById('legacyBackupPassphraseInput');
+        const previewBox = document.getElementById('recordsRestorePreviewBox');
+        const passphrase = passInput ? passInput.value : '';
+
+        if (!passphrase) {
+          this.toast('Please enter the passphrase for this backup file.', 'error');
+          return;
+        }
+
+        try {
+          const decryptedData = await this.decryptLegacyBackupPayload(this._pendingEncryptedBackupPayload, passphrase);
+          const migrated = this.migrateAndNormalizeVaultData(decryptedData);
+
+          this._pendingPlainRestore = {
+            records: migrated.records,
+            customDirectory: migrated.customDirectory
+          };
+
+          if (previewBox) {
+            previewBox.classList.remove('hidden');
+            previewBox.innerHTML = `
+              <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-300 text-xs space-y-2.5">
+                <div class="font-bold text-emerald-950">Decrypted &amp; Converted: ${migrated.records.length} Record(s) Found</div>
+                <p class="text-emerald-900">
+                  Your backup has been converted to the new unencrypted format. You can now import the records directly or download the converted JSON file:
+                </p>
+                <div class="flex flex-wrap justify-end gap-2 pt-1">
+                  <button type="button" onclick="VaultApp.downloadConvertedPlainBackup()" class="px-3 py-1.5 rounded-lg bg-navy-900 hover:bg-navy-800 text-white font-semibold">
+                    Download Converted JSON
+                  </button>
+                  <button type="button" onclick="VaultApp.commitPlainRestore('merge')" class="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-semibold">
+                    Merge Records (${migrated.records.length})
+                  </button>
+                  <button type="button" onclick="VaultApp.commitPlainRestore('replace')" class="px-3 py-1.5 rounded-lg bg-amber-700 hover:bg-amber-600 text-white font-semibold">
+                    Replace Existing Records
+                  </button>
+                </div>
+              </div>
+            `;
+          }
+          this.toast(`Decrypted ${migrated.records.length} record(s) from backup.`, 'success');
+        } catch (err) {
+          this.toast(err.message || 'Failed to decrypt backup file.', 'error');
+        }
+      },
+
+      downloadConvertedPlainBackup() {
+        if (!this._pendingPlainRestore) return;
+        const exportObj = {
+          backupType: 'PesoVault_PH_Records_Backup',
+          schemaVersion: 3,
+          exportedAt: new Date().toISOString(),
+          settings: this.vaultData.settings,
+          customDirectory: this._pendingPlainRestore.customDirectory || [],
+          records: this._pendingPlainRestore.records || []
+        };
+        this.downloadJSONFile(exportObj, `PesoVault_PH_Records_Converted_${new Date().toISOString().slice(0, 10)}.json`);
+        this.toast('Downloaded converted unencrypted JSON backup.', 'success');
       },
 
       async commitPlainRestore(mode = 'merge') {
